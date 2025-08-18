@@ -1,0 +1,93 @@
+# Environment Variables
+.env
+.env.local
+.env.production
+.env.*
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+super_user_tms.db
+training_intelligence.db
+training_system.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+*.err
+
+# Temporary Files
+temp/
+tmp/
+*.tmp
+*.bak
+*.backup
+cache/
+
+# Sensitive Data
+credentials/
+secrets/
+*.key
+*.pem
+*.crt
+
+# User Data
+uploads/
+downloads/
+user_data/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Streamlit
+.streamlit/secrets.toml
+.streamlit/config.toml.local
+
+# Assets that shouldn't be tracked
+assets/videos/*.mp4
+assets/videos/*.MOV
+assets/temp/
+
+# Launch Scripts (local only)
+launch_*.bat
+*.bat.local
