@@ -8,6 +8,7 @@ import base64
 import os
 import time
 from datetime import datetime
+from pathlib import Path
 
 DB_PATH = "swt_tms.db"
 
@@ -43,42 +44,43 @@ def authenticate_user(username, password):
 def show_login():
     """Display login interface with enhanced Smith & Williams branding"""
     
-    # Display video logo - ALWAYS show video if it exists
-    animation_file = "assets/videos/company_logo_animation.mp4.MOV"
-    
+    # Center column for logo/video
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # Always try to display the video first
-        if os.path.exists(animation_file):
-            with open(animation_file, 'rb') as video_file:
-                video_bytes = video_file.read()
-                st.video(video_bytes, format="video/mp4", start_time=0)
-                
-                # Also try HTML5 video for autoplay
-                video_b64 = base64.b64encode(video_bytes).decode()
-                video_html = f'''
-                <div style="text-align: center;">
-                    <video width="100%" height="auto" autoplay loop muted playsinline style="border-radius: 10px;">
-                        <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                        <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                '''
-                st.markdown(video_html, unsafe_allow_html=True)
-        else:
-            # Fallback to logo if video doesn't exist
-            st.error(f"Video not found at: {animation_file}")
-            logo_path = "assets/logos/swt_logo_white.png"
-            if os.path.exists(logo_path):
-                st.image(logo_path, use_container_width=True)
+        # PRIORITY: Display video first, fallback to logo if needed
+        # ONLY ONE WILL DISPLAY - NEVER BOTH
+        video_path = Path("assets/videos/company_logo_animation.mp4.MOV")
+        video_displayed = False
+        
+        if video_path.exists():
+            # VIDEO IS PRIORITY - Try to display the company logo animation
+            try:
+                with open(video_path, 'rb') as video_file:
+                    video_bytes = video_file.read()
+                    
+                    # Use Streamlit's native video player (cleaner, no duplicate)
+                    st.video(video_bytes, format="video/mp4", start_time=0)
+                    video_displayed = True
+                    
+            except Exception as e:
+                # Video failed to load
+                st.warning(f"Video loading issue: {str(e)}")
+                video_displayed = False
+        
+        # ONLY show logo if video was NOT displayed
+        if not video_displayed:
+            # FALLBACK: Show logo since video didn't work
+            logo_path = Path("assets/logos/swt_logo_white.png")
+            if logo_path.exists():
+                st.image(str(logo_path), use_container_width=True)
             else:
-                logo_path = "assets/logos/swt_logo.png"
-                if os.path.exists(logo_path):
-                    st.image(logo_path, use_container_width=True)
+                logo_path = Path("assets/logos/swt_logo.png")
+                if logo_path.exists():
+                    st.image(str(logo_path), use_container_width=True)
                 else:
-                    st.warning("No logo or video found!")
+                    st.error("⚠️ No video or logo found!")
     
+    # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center; color: #8B0000; font-weight: bold;'>SMITH & WILLIAMS TRUCKING</h3>", unsafe_allow_html=True)
     
