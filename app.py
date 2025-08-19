@@ -15,10 +15,16 @@ load_dotenv()
 # Import modules
 from modules.auth import show_login, check_authentication
 from modules.ui_components import apply_global_styles, show_sidebar
-from views.executive import show_executive_view
-from views.data_entry import show_data_feeder_view
-from views.driver import show_driver_view
 from views.user_management import show_user_management
+
+# Import enhanced views
+from views.executive_enhanced import show_executive_view
+from views.data_feeder_enhanced import show_data_feeder_view  
+from views.driver_enhanced import show_driver_view
+
+# Initialize enhanced database
+from modules.database_enhanced import init_enhanced_database
+init_enhanced_database()
 
 # Page Configuration
 st.set_page_config(

@@ -90,4 +90,4 @@ assets/temp/
 
 # Launch Scripts (local only)
 launch_*.bat
-*.bat.local
+*.bat.local*.MOV
