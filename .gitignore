@@ -84,10 +84,11 @@ htmlcov/
 .streamlit/config.toml.local
 
 # Assets that shouldn't be tracked
-assets/videos/*.mp4
-assets/videos/*.MOV
 assets/temp/
+# Note: Logo animation video is tracked for login screen
+# assets/videos/*.mp4
+# assets/videos/*.MOV
 
 # Launch Scripts (local only)
 launch_*.bat
-*.bat.local*.MOV
+*.bat.local
