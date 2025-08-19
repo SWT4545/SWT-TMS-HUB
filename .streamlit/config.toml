@@ -1,6 +1,6 @@
 [theme]
 # Smith & Williams Trucking Theme
-primaryColor = "#8B0000"           # Dark Red
+primaryColor = "#DC2626"           # Red
 backgroundColor = "#000000"        # Black
 secondaryBackgroundColor = "#1a1a1a" # Dark Gray
 textColor = "#ffffff"              # White
