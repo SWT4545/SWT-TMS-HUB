@@ -1,34 +1,16 @@
-[theme]
-# Smith & Williams Trucking Theme
-primaryColor = "#8B0000"           # Dark Red (S&W Brand)
-backgroundColor = "#000000"        # Pure Black
-secondaryBackgroundColor = "#1a1a1a" # Dark Gray
-textColor = "#ffffff"              # White
-font = "sans serif"
-
 [server]
-# Server Configuration
-maxUploadSize = 200                # Max file upload size in MB
-enableCORS = true
-enableXsrfProtection = false
-headless = true                     # Required for cloud deployment
+port = 8501
+address = "0.0.0.0"
+headless = true
 
 [browser]
-# Browser Settings
-gatherUsageStats = false           # Privacy
-serverAddress = "0.0.0.0"
+gatherUsageStats = false
+serverAddress = "localhost"
 serverPort = 8501
 
-[runner]
-# Runner Settings
-magicEnabled = true
-fastReruns = true
-
-[client]
-# Client Settings
-showErrorDetails = false           # Hide errors in production
-toolbarMode = "minimal"            # Clean interface
-
-[deprecation]
-# Disable deprecation warnings in production
-showPyplotGlobalUse = false
+[theme]
+primaryColor = "#8B0000"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#1a1a1a"
+textColor = "#ffffff"
+font = "sans serif"

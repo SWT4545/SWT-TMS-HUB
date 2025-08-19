@@ -43,7 +43,7 @@ def apply_global_styles():
             display: none !important;
         }
         
-        /* Custom S&W header bar */
+        /* Custom S&W header bar with Vernon badge */
         .stApp::before {
             content: 'SMITH & WILLIAMS TRUCKING - TMS';
             position: fixed;
@@ -60,6 +60,24 @@ def apply_global_styles():
             justify-content: center;
             z-index: 999999;
             border-bottom: 3px solid #660000;
+        }
+        
+        /* Vernon badge in navbar */
+        .stApp::after {
+            content: '🔒 VERNON PROTECTED';
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 2px solid white;
+            z-index: 1000000;
+            text-transform: uppercase;
         }
         
         /* Main app - pure black background */
@@ -283,27 +301,32 @@ def apply_global_styles():
             border-radius: 8px !important;
         }
         
-        /* Vernon Protection Badge - Relocated to top right */
+        /* Remove old Vernon badge - now in navbar */
         .vernon-protection {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            background: #8B0000;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            border: 2px solid white;
-            z-index: 99999;
-            text-transform: uppercase;
+            display: none;
+        }
+        
+        /* Fix text truncation globally */
+        * {
+            text-overflow: clip !important;
+            overflow: visible !important;
+        }
+        
+        /* Fix specific truncation issues */
+        .stMarkdown, p, span, label, h1, h2, h3, h4, h5, h6 {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+        }
+        
+        /* Fix metric truncation */
+        div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            min-width: max-content !important;
         }
     </style>
-    
-    <div class="vernon-protection">
-        🔒 VERNON PROTECTED
-    </div>
     """, unsafe_allow_html=True)
 
 def show_sidebar():
@@ -373,9 +396,9 @@ def show_sidebar():
             from modules.auth import logout
             logout()
         
-        # Footer
+        # Footer - moved up to avoid overlap
         st.markdown("""
-        <div style='position: absolute; bottom: 10px; left: 10px; right: 10px;'>
+        <div style='margin-top: 2rem; padding: 1rem 0;'>
             <p style='color: #8B0000; font-size: 10px; text-align: center; margin: 0; font-weight: 700;'>
                 Vernon Security Enabled
             </p>

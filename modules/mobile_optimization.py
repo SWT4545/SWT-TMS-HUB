@@ -214,13 +214,25 @@ def apply_mobile_styles():
             }
         }
         
-        /* Vernon Protection Badge - mobile optimized (top right position) */
+        /* Vernon badge in navbar - mobile optimized */
         @media screen and (max-width: 768px) {
-            .vernon-protection {
-                top: 55px !important;
-                right: 5px !important;
-                padding: 6px 10px !important;
+            .stApp::after {
+                top: 10px !important;
+                right: 10px !important;
+                padding: 5px 8px !important;
                 font-size: 9px !important;
+            }
+        }
+        
+        /* Fix text truncation on mobile */
+        @media screen and (max-width: 768px) {
+            * {
+                text-overflow: clip !important;
+            }
+            
+            .stMarkdown, p, span, label {
+                white-space: normal !important;
+                word-wrap: break-word !important;
             }
         }
         
