@@ -13,6 +13,36 @@ def apply_global_styles():
             display: none !important;
         }
         
+        /* Hide/Minimize Streamlit's "Manage app" button in bottom right */
+        .stDeployButton {
+            display: none !important;
+        }
+        
+        /* Alternative: If you want to keep it but make it smaller/less intrusive */
+        button[kind="header"] {
+            display: none !important;
+        }
+        
+        /* Hide the Streamlit menu button */
+        #MainMenu {
+            visibility: hidden !important;
+        }
+        
+        /* Hide the Streamlit footer */
+        footer {
+            visibility: hidden !important;
+        }
+        
+        /* Hide the Streamlit "Deploy" button specifically */
+        [data-testid="manage-app-button"] {
+            display: none !important;
+        }
+        
+        /* Hide toolbar/menu items */
+        .stToolbar {
+            display: none !important;
+        }
+        
         /* Custom S&W header bar */
         .stApp::before {
             content: 'SMITH & WILLIAMS TRUCKING - TMS';
