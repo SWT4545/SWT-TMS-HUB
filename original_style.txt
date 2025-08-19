@@ -1,0 +1,500 @@
+"""
+===================================================================
+SUPER-USER TRANSPORTATION MANAGEMENT SYSTEM
+Smith & Williams Trucking LLC
+===================================================================
+Enhanced TMS with Three-View Toggle System:
+1. Executive View - High-level oversight and management
+2. Historical Data Feeder - Conversational AI for data entry
+3. Driver View - Mobile-friendly operational interface
+
+CEO & Owner: Brandon Smith
+System Personality: Florida Spillers (TMS Assistant)
+IT Security Head: Vernon (Data Protection & Self-Fixing Protocol)
+Single Profile with Multi-View Capability
+===================================================================
+"""
+
+import streamlit as st
+import pandas as pd
+import sqlite3
+from datetime import datetime, date, timedelta
+import os
+import json
+import time
+import base64
+import hashlib
+import plotly.express as px
+import plotly.graph_objects as go
+from pathlib import Path
+import requests
+import numpy as np
+from dotenv import load_dotenv
+import googlemaps
+from geopy.distance import geodesic
+import re
+
+# Load environment variables for API keys
+load_dotenv()
+
+# Page Configuration
+st.set_page_config(
+    page_title="TMS - Smith & Williams Trucking",
+    page_icon="🚚",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS for S&W Branding
+st.markdown("""
+<style>
+    /* Hide Streamlit header */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    /* Custom S&W header bar */
+    .stApp::before {
+        content: 'SMITH & WILLIAMS TRUCKING - TMS';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background-color: #8B0000;
+        color: white;
+        font-size: 24px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        border-bottom: 3px solid #660000;
+    }
+    
+    /* Main app - pure black background */
+    .stApp {
+        padding-top: 60px;
+        background-color: #000000 !important;
+    }
+    
+    /* Main container - black background with proper spacing */
+    .main .block-container {
+        background-color: #000000 !important;
+        padding-top: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 100%;
+    }
+    
+    /* Prevent text truncation */
+    .element-container {
+        overflow: visible !important;
+    }
+    
+    /* Ensure no text overlap */
+    div[data-testid="stVerticalBlock"] > div {
+        margin-bottom: 1rem;
+    }
+    
+    /* Sidebar - black background with red accent */
+    section[data-testid="stSidebar"] {
+        background-color: #000000 !important;
+        border-right: 3px solid #8B0000 !important;
+    }
+    
+    /* Sidebar content - white text for visibility */
+    section[data-testid="stSidebar"] .stMarkdown, 
+    section[data-testid="stSidebar"] p, 
+    section[data-testid="stSidebar"] span, 
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] .stRadio label,
+    section[data-testid="stSidebar"] div[data-testid="stMetricValue"] {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-shadow: 1px 1px 2px rgba(139, 0, 0, 0.3) !important;
+    }
+    
+    /* Sidebar headers - extra bold */
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6 {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        text-shadow: 2px 2px 4px rgba(139, 0, 0, 0.5) !important;
+    }
+    
+    /* Sidebar buttons - S&W red with clean borders */
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #8B0000 !important;
+        color: white !important;
+        border: 3px solid #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #A00000 !important;
+        border: 3px solid #ffcccc !important;
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    /* Main area text - white on black */
+    .stMarkdown, p, span, label, li {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+        text-shadow: 1px 1px 2px rgba(139, 0, 0, 0.3) !important;
+    }
+    
+    /* Headers with S&W branding */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        text-shadow: 2px 2px 4px rgba(139, 0, 0, 0.5) !important;
+        border-bottom: 2px solid #8B0000 !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Metrics - black with red accent, white text, no truncation */
+    div[data-testid="metric-container"] {
+        background-color: #1a1a1a !important;
+        border: 3px solid #8B0000 !important;
+        border-radius: 10px !important;
+        padding: 20px !important;
+        box-shadow: 0 4px 6px rgba(139, 0, 0, 0.3) !important;
+        min-width: 200px !important;
+        overflow: visible !important;
+    }
+    
+    /* Metric labels - white and visible */
+    div[data-testid="metric-container"] label {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    /* Metric values - large white text with no truncation */
+    div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        width: auto !important;
+        min-width: fit-content !important;
+    }
+    
+    /* Metric delta - green/red for positive/negative */
+    div[data-testid="metric-container"] div[data-testid="stMetricDelta"] {
+        color: #00ff00 !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+    }
+    
+    /* Ensure metric columns don't truncate */
+    div[data-testid="column"] {
+        overflow: visible !important;
+        min-width: fit-content !important;
+    }
+    
+    /* Sidebar metrics - white text */
+    section[data-testid="stSidebar"] div[data-testid="metric-container"] {
+        background-color: #1a1a1a !important;
+        border: 2px solid #8B0000 !important;
+        padding: 15px !important;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="metric-container"] label {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 1.8rem !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+    }
+    
+    /* Tabs - S&W branded with clean borders */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #000000 !important;
+        border-bottom: 3px solid #8B0000 !important;
+        gap: 2px !important;
+        padding: 0 !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        color: #ffffff !important;
+        background-color: #1a1a1a !important;
+        border: 2px solid #ffffff !important;
+        border-bottom: none !important;
+        font-weight: 600 !important;
+        margin: 0 2px !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #8B0000 !important;
+        color: #ffffff !important;
+        border: 3px solid #ffffff !important;
+        border-bottom: none !important;
+    }
+    
+    /* Input fields - black with red border */
+    .stTextInput input, .stSelectbox select, .stNumberInput input, .stTextArea textarea {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+        border: 2px solid #8B0000 !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Buttons - S&W branded with clean borders */
+    .stButton button {
+        background-color: #8B0000 !important;
+        color: white !important;
+        border: 3px solid #ffffff !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    .stButton button:hover {
+        background-color: #A00000 !important;
+        border: 3px solid #ffcccc !important;
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* Form Submit Buttons - Override Streamlit's blue primary button */
+    button[kind="primary"] {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 3px solid #8B0000 !important;
+    }
+    
+    button[kind="secondary"] {
+        background-color: #8B0000 !important;
+        color: #ffffff !important;
+        border: 3px solid #000000 !important;
+    }
+    
+    /* More aggressive override for form buttons */
+    .stFormSubmitButton > button {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 3px solid #8B0000 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+    }
+    
+    .stFormSubmitButton > button:nth-child(1) {
+        background-color: #000000 !important;
+        border: 3px solid #8B0000 !important;
+    }
+    
+    .stFormSubmitButton > button:hover {
+        background-color: #1a1a1a !important;
+        border: 3px solid #ff0000 !important;
+    }
+    
+    /* Tables/DataFrames - black theme with borders */
+    .stDataFrame {
+        background-color: #000000 !important;
+        border: 3px solid #8B0000 !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3) !important;
+    }
+    
+    /* Table container */
+    div[data-testid="stDataFrameContainer"] {
+        border: 2px solid #ffffff !important;
+        border-radius: 8px !important;
+        padding: 5px !important;
+        background-color: #1a1a1a !important;
+    }
+    
+    /* Table cells with borders */
+    div[data-testid="data-grid"] {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+    
+    /* Table headers */
+    .dvn-scroller table thead tr th {
+        background-color: #8B0000 !important;
+        color: #ffffff !important;
+        border: 1px solid #ffffff !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        padding: 10px !important;
+    }
+    
+    /* Table rows */
+    .dvn-scroller table tbody tr {
+        border-bottom: 1px solid #8B0000 !important;
+    }
+    
+    /* Table cells */
+    .dvn-scroller table tbody tr td {
+        border-right: 1px solid #444444 !important;
+        padding: 8px !important;
+        color: #ffffff !important;
+    }
+    
+    /* Hover effect on rows */
+    .dvn-scroller table tbody tr:hover {
+        background-color: #2a0000 !important;
+    }
+    
+    /* Info/Success/Warning boxes - branded */
+    .stAlert {
+        background-color: #1a1a1a !important;
+        border: 2px solid #8B0000 !important;
+        color: #ffffff !important;
+    }
+    
+    /* Chat messages - black theme */
+    .stChatMessage {
+        background-color: #1a1a1a !important;
+        border: 1px solid #8B0000 !important;
+    }
+    
+    /* Dividers - red */
+    hr {
+        border-color: #8B0000 !important;
+        border-width: 2px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ===================================================================
+# DATABASE INITIALIZATION WITH ENHANCED SCHEMA
+# ===================================================================
+
+def init_enhanced_database():
+    """Initialize database with enhanced schema for super-user system"""
+    conn = sqlite3.connect('super_user_tms.db')
+    cursor = conn.cursor()
+    
+    # Enhanced loads table with new fields
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS loads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        load_id TEXT UNIQUE NOT NULL,
+        carrier TEXT,
+        customer TEXT,
+        pickup_date DATETIME,
+        delivery_date DATETIME,
+        pickup_address TEXT,
+        delivery_address TEXT,
+        status TEXT DEFAULT 'pending',
+        payment_method TEXT,
+        gross_amount REAL,
+        net_amount REAL,
+        mileage REAL,
+        gross_rate_per_mile REAL,
+        net_rate_per_mile REAL,
+        driver_id INTEGER,
+        truck_id INTEGER,
+        rc_document TEXT,
+        bol_document TEXT,
+        pod_document TEXT,
+        notes TEXT,
+        created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
+        gps_data TEXT,
+        check_in_data TEXT,
+        delays TEXT,
+        FOREIGN KEY(driver_id) REFERENCES users(id),
+        FOREIGN KEY(truck_id) REFERENCES equipment(id)
+    )""")
+    
+    # Payments table for reconciliation
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        payment_amount REAL NOT NULL,
+        payment_date DATE NOT NULL,
+        paying_entity TEXT NOT NULL,
+        reconciled_loads TEXT,
+        notes TEXT,
+        created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    )""")
+    
+    # Enhanced users table with view preferences
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL,
+        full_name TEXT,
+        email TEXT,
+        phone TEXT,
+        current_view TEXT DEFAULT 'executive',
+        preferences TEXT,
+        created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    )""")
+    
+    # Equipment table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS equipment (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        unit_number TEXT UNIQUE NOT NULL,
+        type TEXT,
+        make TEXT,
+        model TEXT,
+        year INTEGER,
+        vin TEXT,
+        status TEXT DEFAULT 'available',
+        current_location TEXT,
+        last_gps_update DATETIME
+    )""")
+    
+    # Geofences table for automated check-ins
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS geofences (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        address TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        radius_meters INTEGER DEFAULT 500,
+        type TEXT
+    )""")
+    
+    # Chat history for AI conversations
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS chat_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        view_type TEXT,
+        message TEXT,
+        response TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )""")
+    
+    # Create CEO user if not exists (Brandon)
+    cursor.execute("SELECT * FROM users WHERE username = ?", ('Brandon',))
+    if not cursor.fetchone():
+        ceo_password = hashlib.sha256('ceo123'.encode()).hexdigest()

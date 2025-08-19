@@ -41,171 +41,108 @@ def authenticate_user(username, password):
     return None
 
 def show_login():
-    """Display login page with Smith & Williams branding and video logo"""
+    """Display login interface with enhanced Smith & Williams branding"""
     
-    # Custom CSS for login page - Red, Black, and White theme
-    st.markdown("""
-    <style>
-        /* Login Page Styling - Smith & Williams Theme */
-        .main {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-        }
-        
-        .stApp {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-        }
-        
-        /* Login container */
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
-            border: 2px solid #DC2626;
-        }
-        
-        /* Headers */
-        h1 {
-            color: #DC2626 !important;
-            text-align: center;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        h3 {
-            color: #8B0000 !important;
-            text-align: center;
-        }
-        
-        /* Input fields */
-        .stTextInput > div > div > input {
-            background-color: white;
-            border: 2px solid #DC2626;
-            border-radius: 5px;
-            color: #000000;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: #8B0000;
-            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
-        }
-        
-        /* Buttons */
-        .stButton > button {
-            background: linear-gradient(135deg, #DC2626 0%, #8B0000 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            border-radius: 5px;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        
-        .stButton > button:hover {
-            background: linear-gradient(135deg, #8B0000 0%, #DC2626 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-        }
-        
-        /* Video container */
-        .video-container {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-        }
-        
-        /* Footer */
-        .login-footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 1rem;
-            border-top: 2px solid #DC2626;
-            color: white;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    # Display video logo
+    animation_file = "assets/videos/company_logo_animation.mp4.MOV"
     
-    # Create centered login form
     col1, col2, col3 = st.columns([1, 2, 1])
-    
     with col2:
-        # Display video logo
-        animation_file = "assets/videos/company_logo_animation.mp4.MOV"
-        
         if os.path.exists(animation_file):
             try:
                 with open(animation_file, 'rb') as video_file:
                     video_bytes = video_file.read()
                     video_b64 = base64.b64encode(video_bytes).decode()
                     video_html = f'''
-                    <div class="video-container">
-                        <video width="100%" height="auto" autoplay loop muted playsinline style="max-width: 400px; border-radius: 10px;">
-                            <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
+                    <video width="100%" autoplay loop muted playsinline>
+                        <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                    </video>
                     '''
                     st.markdown(video_html, unsafe_allow_html=True)
-            except Exception as e:
-                # Fallback to static logo
+            except:
+                logo_path = "assets/logos/swt_logo_white.png"
+                if os.path.exists(logo_path):
+                    st.image(logo_path, use_container_width=True)
+                else:
+                    logo_path = "assets/logos/swt_logo.png"
+                    if os.path.exists(logo_path):
+                        st.image(logo_path, use_container_width=True)
+        else:
+            logo_path = "assets/logos/swt_logo_white.png"
+            if os.path.exists(logo_path):
+                st.image(logo_path, use_container_width=True)
+            else:
                 logo_path = "assets/logos/swt_logo.png"
                 if os.path.exists(logo_path):
                     st.image(logo_path, use_container_width=True)
-        else:
-            # Fallback to static logo
-            logo_path = "assets/logos/swt_logo.png"
-            if os.path.exists(logo_path):
-                st.image(logo_path, use_container_width=True)
-        
-        # Company name and title
-        st.markdown("<h1>🚚 SMITH & WILLIAMS TRUCKING</h1>", unsafe_allow_html=True)
-        st.markdown("<h3>Transportation Management System</h3>", unsafe_allow_html=True)
-        
-        # Login form
-        st.markdown('<div class="login-container">', unsafe_allow_html=True)
-        
-        with st.form("login_form", clear_on_submit=False):
-            username = st.text_input("Username", placeholder="Enter your username")
-            password = st.text_input("Password", type="password", placeholder="Enter your password")
-            
-            col_btn1, col_btn2 = st.columns(2)
-            with col_btn1:
-                login_button = st.form_submit_button("🔐 Login", type="primary", use_container_width=True)
-            with col_btn2:
-                clear_button = st.form_submit_button("🔄 Clear", use_container_width=True)
-            
-            if login_button:
-                if username and password:
-                    user = authenticate_user(username, password)
-                    if user:
-                        st.session_state.authenticated = True
-                        st.session_state.user = user['username']
-                        st.session_state.role = user['role']
-                        st.session_state.user_full_name = user['full_name']
-                        st.session_state.user_id = user['id']
-                        st.success(f"Welcome back, {user['full_name']}!")
-                        time.sleep(1)
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid username or password")
-                else:
-                    st.warning("⚠️ Please enter both username and password")
-            
-            if clear_button:
-                st.rerun()
-        
-        st.markdown('</div>', unsafe_allow_html=True)
     
-    # Footer with Vernon protection message
+    st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #8B0000; font-weight: bold;'>SMITH & WILLIAMS TRUCKING</h3>", unsafe_allow_html=True)
+    
+    # Login form with proper styling
+    with st.form("login_form", clear_on_submit=False):
+        username = st.text_input("Username", placeholder="Enter your username")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            login_button = st.form_submit_button("🔐 LOGIN", type="primary", use_container_width=True)
+        with col_btn2:
+            clear_button = st.form_submit_button("🔄 CLEAR", use_container_width=True)
+        
+        if login_button:
+            if username and password:
+                user = authenticate_user(username, password)
+                if user:
+                    st.session_state.authenticated = True
+                    st.session_state.user = user['username']
+                    st.session_state.role = user['role']
+                    st.session_state.user_full_name = user['full_name']
+                    st.session_state.user_id = user['id']
+                    st.success(f"Welcome back, {user['full_name']}!")
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid username or password")
+            else:
+                st.warning("⚠️ Please enter both username and password")
+        
+        if clear_button:
+            st.rerun()
+    
+    # Apply aggressive button styling using JavaScript injection
     st.markdown("""
-    <div class='login-footer'>
-        <p style='color: #DC2626; font-size: 12px; font-weight: 600; letter-spacing: 1px; margin: 0;'>
+    <script>
+        // Wait for page to load then style buttons
+        setTimeout(function() {
+            // Find all form submit buttons
+            const buttons = document.querySelectorAll('.stFormSubmitButton button');
+            if (buttons.length >= 2) {
+                // Style Login button - black with red border
+                buttons[0].style.backgroundColor = '#000000';
+                buttons[0].style.color = '#ffffff';
+                buttons[0].style.border = '3px solid #8B0000';
+                buttons[0].style.fontWeight = '700';
+                buttons[0].style.textTransform = 'uppercase';
+                
+                // Style Clear button - red with black border  
+                buttons[1].style.backgroundColor = '#8B0000';
+                buttons[1].style.color = '#ffffff';
+                buttons[1].style.border = '3px solid #000000';
+                buttons[1].style.fontWeight = '700';
+                buttons[1].style.textTransform = 'uppercase';
+            }
+        }, 100);
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Vernon Protection Footer
+    st.markdown("""
+    <div style='text-align: center; padding: 2rem; margin-top: 3rem; border-top: 3px solid #8B0000;'>
+        <p style='color: #8B0000; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin: 0; text-transform: uppercase;'>
             🔒 DATA PROTECTED BY VERNON - SENIOR IT SECURITY MANAGER
         </p>
-        <p style='color: #ffffff; font-size: 11px; margin-top: 5px;'>
+        <p style='color: white; font-size: 11px; margin-top: 5px; font-weight: 600;'>
             © 2025 Smith & Williams Trucking LLC - All Rights Reserved
         </p>
     </div>

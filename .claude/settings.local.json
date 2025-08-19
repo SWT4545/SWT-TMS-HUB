@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --version)",
+      "Bash(pip show:*)",
+      "Bash(git init:*)",
+      "Bash(streamlit run:*)",
+      "Bash(pip install:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)",
+      "Bash(mkdir:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(python:*)",
+      "Bash(venvScripts:*)",
+      "Bash(powershell:*)",
+      "Bash(git rm:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

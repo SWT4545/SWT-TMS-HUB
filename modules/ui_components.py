@@ -8,207 +8,249 @@ def apply_global_styles():
     """Apply Smith & Williams red/black/white theme globally"""
     st.markdown("""
     <style>
-        /* Smith & Williams Trucking - Global Theme */
-        
-        /* Main app background */
-        .main {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            padding: 0;
+        /* Hide Streamlit header */
+        header[data-testid="stHeader"] {
+            display: none !important;
         }
         
+        /* Custom S&W header bar */
+        .stApp::before {
+            content: 'SMITH & WILLIAMS TRUCKING - TMS';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #8B0000;
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            border-bottom: 3px solid #660000;
+        }
+        
+        /* Main app - pure black background */
         .stApp {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            background-attachment: fixed;
+            padding-top: 60px;
+            background-color: #000000 !important;
         }
         
-        /* Headers - Red */
-        h1, h2, h3, h4, h5, h6 {
-            color: #DC2626 !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: 700;
+        /* Main container - black background with proper spacing */
+        .main .block-container {
+            background-color: #000000 !important;
+            padding-top: 2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            max-width: 100%;
         }
         
-        /* Sidebar - Black gradient */
-        section[data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
-            border-right: 3px solid #DC2626;
-        }
-        
-        section[data-testid="stSidebar"] .stMarkdown {
-            color: white;
-        }
-        
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3 {
-            color: #DC2626 !important;
-        }
-        
-        /* Buttons - Red gradient */
-        .stButton > button {
-            background: linear-gradient(135deg, #DC2626 0%, #8B0000 100%);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .stButton > button:hover {
-            background: linear-gradient(135deg, #8B0000 0%, #DC2626 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-        }
-        
-        /* Tabs - Red accent */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
-            background-color: rgba(0, 0, 0, 0.2);
-            padding: 5px;
-            border-radius: 10px;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #000000;
-            border-radius: 5px;
-            font-weight: 600;
-        }
-        
-        .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-            background-color: #DC2626 !important;
-            color: white !important;
-        }
-        
-        /* Metrics - White cards with red accents */
-        [data-testid="metric-container"] {
-            background-color: rgba(255, 255, 255, 0.95);
-            border: 2px solid #DC2626;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
-        }
-        
-        [data-testid="metric-container"] [data-testid="metric-label"] {
-            color: #8B0000;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-        
-        [data-testid="metric-container"] [data-testid="metric-value"] {
-            color: #000000;
-            font-weight: 700;
-        }
-        
-        /* Input fields */
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div > select,
-        .stTextArea > div > div > textarea {
-            background-color: rgba(255, 255, 255, 0.95);
-            border: 2px solid #DC2626;
-            border-radius: 5px;
-            color: #000000;
-        }
-        
-        .stTextInput > div > div > input:focus,
-        .stSelectbox > div > div > select:focus,
-        .stTextArea > div > div > textarea:focus {
-            border-color: #8B0000;
-            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
-        }
-        
-        /* Dataframes/Tables */
-        .dataframe {
-            background-color: white !important;
-            color: black !important;
-        }
-        
-        .dataframe thead th {
-            background: #DC2626 !important;
-            color: white !important;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-        
-        .dataframe tbody tr:hover {
-            background-color: rgba(220, 38, 38, 0.1) !important;
-        }
-        
-        /* Expanders */
-        .streamlit-expanderHeader {
-            background-color: rgba(220, 38, 38, 0.1);
-            border: 1px solid #DC2626;
-            border-radius: 5px;
-            color: #DC2626;
-            font-weight: 600;
-        }
-        
-        .streamlit-expanderHeader:hover {
-            background-color: rgba(220, 38, 38, 0.2);
-        }
-        
-        /* Success/Error/Warning/Info boxes */
-        .stAlert {
-            border-radius: 5px;
-            border-left: 5px solid;
-        }
-        
-        div[data-baseweb="notification"] {
-            border-radius: 5px;
-        }
-        
-        /* Cards and containers */
+        /* Prevent text truncation */
         .element-container {
-            border-radius: 10px;
+            overflow: visible !important;
         }
         
-        /* Custom card styling */
-        .custom-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border: 2px solid #DC2626;
-            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+        /* Ensure no text overlap */
+        div[data-testid="stVerticalBlock"] > div {
             margin-bottom: 1rem;
         }
         
-        /* Progress bars */
-        .stProgress > div > div {
-            background-color: #DC2626;
+        /* Sidebar - black background with red accent */
+        section[data-testid="stSidebar"] {
+            background-color: #000000 !important;
+            border-right: 3px solid #8B0000 !important;
         }
         
-        /* Sliders */
-        .stSlider > div > div > div {
-            background-color: #DC2626;
+        /* Sidebar content - white text for visibility */
+        section[data-testid="stSidebar"] .stMarkdown, 
+        section[data-testid="stSidebar"] p, 
+        section[data-testid="stSidebar"] span, 
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] .stRadio label,
+        section[data-testid="stSidebar"] div[data-testid="stMetricValue"] {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            text-shadow: 1px 1px 2px rgba(139, 0, 0, 0.3) !important;
         }
         
-        /* Radio buttons and checkboxes */
-        .stRadio > label,
-        .stCheckbox > label {
+        /* Sidebar headers - extra bold */
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] h4,
+        section[data-testid="stSidebar"] h5,
+        section[data-testid="stSidebar"] h6 {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            text-shadow: 2px 2px 4px rgba(139, 0, 0, 0.5) !important;
+        }
+        
+        /* Sidebar buttons - S&W red with clean borders */
+        section[data-testid="stSidebar"] .stButton button {
+            background-color: #8B0000 !important;
             color: white !important;
+            border: 3px solid #ffffff !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            padding: 0.5rem 1rem !important;
+            box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2) !important;
         }
         
-        /* Download button special styling */
-        .stDownloadButton > button {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
+        section[data-testid="stSidebar"] .stButton button:hover {
+            background-color: #A00000 !important;
+            border: 3px solid #ffcccc !important;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4) !important;
         }
         
-        .stDownloadButton > button:hover {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        /* Main area text - white on black */
+        .stMarkdown, p, span, label, li {
+            color: #ffffff !important;
+            font-weight: 500 !important;
+            text-shadow: 1px 1px 2px rgba(139, 0, 0, 0.3) !important;
         }
         
-        /* Form submit button */
-        div[data-testid="stForm"] button[type="submit"] {
-            background: linear-gradient(135deg, #DC2626 0%, #8B0000 100%);
-            color: white;
-            font-weight: 700;
-            text-transform: uppercase;
+        /* Headers with S&W branding */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-shadow: 2px 2px 4px rgba(139, 0, 0, 0.5) !important;
+            border-bottom: 2px solid #8B0000 !important;
+            padding-bottom: 10px !important;
+            margin-bottom: 20px !important;
+        }
+        
+        /* Metrics - black with red accent, white text, no truncation */
+        div[data-testid="metric-container"] {
+            background-color: #1a1a1a !important;
+            border: 3px solid #8B0000 !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.3) !important;
+            min-width: 200px !important;
+            overflow: visible !important;
+        }
+        
+        /* Metric labels - white and visible */
+        div[data-testid="metric-container"] label {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        /* Metric values - large white text with no truncation */
+        div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            font-size: 2.5rem !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            width: auto !important;
+            min-width: fit-content !important;
+        }
+        
+        /* Metric delta - green/red for positive/negative */
+        div[data-testid="metric-container"] div[data-testid="stMetricDelta"] {
+            color: #00ff00 !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Buttons - S&W red style */
+        .stButton button {
+            background-color: #8B0000 !important;
+            color: white !important;
+            border: 2px solid #ffffff !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
+        
+        .stButton button:hover {
+            background-color: #A00000 !important;
+            border: 2px solid #ffcccc !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.5) !important;
+        }
+        
+        /* Tabs - black with red underline */
+        .stTabs [data-baseweb="tab-list"] {
+            background-color: #000000 !important;
+            border-bottom: 3px solid #8B0000 !important;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            background-color: #1a1a1a !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background-color: #8B0000 !important;
+            border: 2px solid #ffffff !important;
+            border-bottom: none !important;
+        }
+        
+        /* Input fields - black with red border */
+        .stTextInput input, .stTextArea textarea, .stSelectbox select, .stNumberInput input {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 2px solid #8B0000 !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+        
+        .stTextInput input:focus, .stTextArea textarea:focus, 
+        .stSelectbox select:focus, .stNumberInput input:focus {
+            border: 3px solid #ff0000 !important;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.5) !important;
+        }
+        
+        /* Dataframes - black with red accents */
+        .dataframe {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 2px solid #8B0000 !important;
+        }
+        
+        .dataframe th {
+            background-color: #8B0000 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+        }
+        
+        .dataframe td {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+            border: 1px solid #333333 !important;
+        }
+        
+        /* Expanders - black with red accent */
+        .streamlit-expanderHeader {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 2px solid #8B0000 !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            background-color: #2a2a2a !important;
+            border: 2px solid #ff0000 !important;
+        }
+        
+        /* Success/Error/Warning/Info messages */
+        .stAlert {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border: 2px solid #8B0000 !important;
+            border-radius: 8px !important;
         }
         
         /* Vernon Protection Badge */
@@ -216,15 +258,16 @@ def apply_global_styles():
             position: fixed;
             bottom: 10px;
             right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: #DC2626;
-            padding: 5px 10px;
+            background: #8B0000;
+            color: white;
+            padding: 8px 15px;
             border-radius: 5px;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            border: 1px solid #DC2626;
-            z-index: 9999;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 2px solid white;
+            z-index: 99999;
+            text-transform: uppercase;
         }
     </style>
     
@@ -238,18 +281,18 @@ def show_sidebar():
     with st.sidebar:
         # Company branding
         st.markdown("""
-        <div style='text-align: center; padding: 1rem; background: rgba(220, 38, 38, 0.1); border-radius: 10px; margin-bottom: 1rem;'>
-            <h2 style='margin: 0; color: #DC2626;'>🚚 SWT</h2>
-            <p style='margin: 0; color: white; font-size: 0.9rem;'>Smith & Williams Trucking</p>
+        <div style='text-align: center; padding: 1rem; background: #8B0000; border-radius: 10px; margin-bottom: 1rem; border: 3px solid white;'>
+            <h2 style='margin: 0; color: white; font-weight: 900;'>🚚 SWT</h2>
+            <p style='margin: 0; color: white; font-size: 0.9rem; font-weight: 700;'>Smith & Williams Trucking</p>
         </div>
         """, unsafe_allow_html=True)
         
         # User info
         if 'user_full_name' in st.session_state:
             st.markdown(f"""
-            <div style='background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;'>
-                <p style='color: white; margin: 0; font-size: 0.9rem;'>👤 <strong>{st.session_state.user_full_name}</strong></p>
-                <p style='color: #DC2626; margin: 0; font-size: 0.8rem; text-transform: uppercase;'>{st.session_state.role}</p>
+            <div style='background: #1a1a1a; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border: 2px solid #8B0000;'>
+                <p style='color: white; margin: 0; font-size: 0.9rem; font-weight: 600;'>👤 <strong>{st.session_state.user_full_name}</strong></p>
+                <p style='color: #8B0000; margin: 0; font-size: 0.8rem; text-transform: uppercase; font-weight: 700;'>{st.session_state.role}</p>
             </div>
             """, unsafe_allow_html=True)
         
@@ -295,7 +338,7 @@ def show_sidebar():
         # Footer
         st.markdown("""
         <div style='position: absolute; bottom: 10px; left: 10px; right: 10px;'>
-            <p style='color: #DC2626; font-size: 10px; text-align: center; margin: 0;'>
+            <p style='color: #8B0000; font-size: 10px; text-align: center; margin: 0; font-weight: 700;'>
                 Vernon Security Enabled
             </p>
             <p style='color: white; font-size: 9px; text-align: center; margin: 0;'>
@@ -308,13 +351,13 @@ def create_metric_card(title, value, delta=None, delta_color="normal"):
     """Create a custom metric card with Smith & Williams styling"""
     delta_html = ""
     if delta is not None:
-        color = "#10b981" if delta_color == "normal" else "#ef4444"
-        delta_html = f"<p style='color: {color}; font-size: 0.9rem; margin: 0;'>{delta}</p>"
+        color = "#00ff00" if delta_color == "normal" else "#ff0000"
+        delta_html = f"<p style='color: {color}; font-size: 0.9rem; margin: 0; font-weight: 600;'>{delta}</p>"
     
     return f"""
-    <div class='custom-card'>
-        <h4 style='color: #8B0000; margin: 0; font-size: 0.9rem; text-transform: uppercase;'>{title}</h4>
-        <h2 style='color: #000000; margin: 0.5rem 0;'>{value}</h2>
+    <div style='background: #1a1a1a; padding: 1.5rem; border-radius: 10px; border: 3px solid #8B0000; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.3);'>
+        <h4 style='color: white; margin: 0; font-size: 0.9rem; text-transform: uppercase; font-weight: 700;'>{title}</h4>
+        <h2 style='color: white; margin: 0.5rem 0; font-weight: 800;'>{value}</h2>
         {delta_html}
     </div>
     """
@@ -322,11 +365,11 @@ def create_metric_card(title, value, delta=None, delta_color="normal"):
 def show_data_protection_footer():
     """Display Vernon data protection footer"""
     st.markdown("""
-    <div style='text-align: center; padding: 2rem; margin-top: 3rem; border-top: 2px solid #DC2626; background: rgba(255, 255, 255, 0.95);'>
-        <p style='color: #DC2626; font-size: 12px; font-weight: 600; letter-spacing: 1px; margin: 0;'>
+    <div style='text-align: center; padding: 2rem; margin-top: 3rem; border-top: 3px solid #8B0000; background: #000000;'>
+        <p style='color: #8B0000; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin: 0; text-transform: uppercase;'>
             🔒 DATA PROTECTED BY VERNON - SENIOR IT SECURITY MANAGER
         </p>
-        <p style='color: #666; font-size: 10px; margin-top: 5px;'>
+        <p style='color: white; font-size: 10px; margin-top: 5px; font-weight: 600;'>
             © 2025 Smith & Williams Trucking LLC - Professional Fleet Management Solutions
         </p>
     </div>
