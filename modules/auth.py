@@ -12,8 +12,54 @@ from pathlib import Path
 
 DB_PATH = "swt_tms.db"
 
+def init_database():
+    """Initialize database with users table if it doesn't exist"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # Create users table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL,
+        full_name TEXT,
+        email TEXT,
+        phone TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP,
+        is_active BOOLEAN DEFAULT 1
+    )''')
+    
+    # Check if any users exist
+    cursor.execute("SELECT COUNT(*) FROM users")
+    user_count = cursor.fetchone()[0]
+    
+    # If no users, create default admin
+    if user_count == 0:
+        # Create default brandon/ceo123 user
+        brandon_hash = hashlib.sha256("ceo123".encode()).hexdigest()
+        cursor.execute("""INSERT INTO users 
+            (username, password_hash, role, full_name, email, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            ("brandon", brandon_hash, "super_user", "Brandon Smith", "brandon@swtrucking.com", 1))
+        
+        # Also create a demo admin
+        admin_hash = hashlib.sha256("admin123".encode()).hexdigest()
+        cursor.execute("""INSERT INTO users 
+            (username, password_hash, role, full_name, email, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            ("admin", admin_hash, "super_user", "System Administrator", "admin@swtrucking.com", 1))
+        
+        conn.commit()
+    
+    conn.close()
+
 def authenticate_user(username, password):
     """Authenticate user against database"""
+    # Ensure database exists
+    init_database()
+    
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     password_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -44,45 +90,73 @@ def authenticate_user(username, password):
 def show_login():
     """Display login interface with enhanced Smith & Williams branding"""
     
+    # Initialize database on first run
+    init_database()
+    
     # Center column for logo/video
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         # PRIORITY: Display video first, fallback to logo if needed
         # ONLY ONE WILL DISPLAY - NEVER BOTH
-        video_path = Path("assets/videos/company_logo_animation.mp4.MOV")
+        
+        # Try multiple possible video paths
+        video_paths = [
+            Path("assets/videos/company_logo_animation.mp4.MOV"),
+            Path("assets") / "videos" / "company_logo_animation.mp4.MOV",
+            Path("config") / "company_logo_animation.mp4.MOV",  # Check config folder as mentioned
+            Path("templates") / "company_logo_animation.mp4.MOV"
+        ]
+        
         video_displayed = False
         
-        if video_path.exists():
-            # VIDEO IS PRIORITY - Try to display the company logo animation
-            try:
-                with open(video_path, 'rb') as video_file:
-                    video_bytes = video_file.read()
-                    
-                    # Use Streamlit's native video player (cleaner, no duplicate)
-                    st.video(video_bytes, format="video/mp4", start_time=0)
-                    video_displayed = True
-                    
-            except Exception as e:
-                # Video failed to load
-                st.warning(f"Video loading issue: {str(e)}")
-                video_displayed = False
+        for video_path in video_paths:
+            if video_path.exists():
+                # VIDEO IS PRIORITY - Try to display the company logo animation
+                try:
+                    with open(video_path, 'rb') as video_file:
+                        video_bytes = video_file.read()
+                        
+                        # Use Streamlit's native video player (cleaner, no duplicate)
+                        st.video(video_bytes, format="video/mp4", start_time=0)
+                        video_displayed = True
+                        break  # Stop once video is displayed
+                        
+                except Exception as e:
+                    # Video failed to load
+                    continue  # Try next path
         
         # ONLY show logo if video was NOT displayed
         if not video_displayed:
             # FALLBACK: Show logo since video didn't work
-            logo_path = Path("assets/logos/swt_logo_white.png")
-            if logo_path.exists():
-                st.image(str(logo_path), use_container_width=True)
-            else:
-                logo_path = Path("assets/logos/swt_logo.png")
+            logo_paths = [
+                Path("assets/logos/swt_logo_white.png"),
+                Path("assets") / "logos" / "swt_logo_white.png",
+                Path("assets/logos/swt_logo.png"),
+                Path("assets") / "logos" / "swt_logo.png"
+            ]
+            
+            logo_displayed = False
+            for logo_path in logo_paths:
                 if logo_path.exists():
                     st.image(str(logo_path), use_container_width=True)
-                else:
-                    st.error("⚠️ No video or logo found!")
+                    logo_displayed = True
+                    break
+            
+            if not logo_displayed:
+                # Show placeholder if nothing found
+                st.info("🚚 Smith & Williams Trucking")
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
     st.markdown("<h3 style='text-align: center; color: #8B0000; font-weight: bold;'>SMITH & WILLIAMS TRUCKING</h3>", unsafe_allow_html=True)
+    
+    # Show default credentials info
+    with st.expander("📌 Login Information"):
+        st.info("""
+        **Default Credentials:**
+        - Username: `brandon` | Password: `ceo123`
+        - Username: `admin` | Password: `admin123`
+        """)
     
     # Login form with proper styling
     with st.form("login_form", clear_on_submit=False):
