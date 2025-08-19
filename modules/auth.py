@@ -99,45 +99,32 @@ def show_login():
         # PRIORITY: Display video first, fallback to logo if needed
         # ONLY ONE WILL DISPLAY - NEVER BOTH
         
-        # Try multiple possible video paths
-        video_paths = [
-            Path("assets/videos/company_logo_animation.mp4.MOV"),
-            Path("assets") / "videos" / "company_logo_animation.mp4.MOV",
-            Path("assets/videos/company_logo_animation.mp4"),
-            Path("assets") / "videos" / "company_logo_animation.mp4"
-        ]
+        # Try to display the video using direct file access
+        video_path = Path("assets/videos/company_logo_animation.mp4.MOV")
         
-        video_found = False
-        for video_path in video_paths:
-            if video_path.exists():
-                # Display the company logo animation video with HTML5 video tag for better control
+        # Check if file exists locally
+        if video_path.exists():
+            try:
+                # Read and encode video for display
+                with open(video_path, 'rb') as video_file:
+                    video_bytes = video_file.read()
+                    
+                # Use Streamlit's native video player with loop functionality
+                st.video(video_bytes, format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
+                    
+            except Exception as e:
+                # If reading fails, try using the file directly
                 try:
-                    with open(video_path, 'rb') as video_file:
-                        video_bytes = video_file.read()
-                        video_b64 = base64.b64encode(video_bytes).decode()
-                        
-                        # Use HTML5 video with autoplay, muted, and loop
-                        video_html = f'''
-                        <div style="display: flex; justify-content: center; margin: 20px 0;">
-                            <video width="400" autoplay muted loop playsinline style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        '''
-                        st.markdown(video_html, unsafe_allow_html=True)
-                        video_found = True
-                        break  # Stop once video is displayed
-                        
-                except Exception as e:
-                    # Video failed to load
-                    st.warning(f"Video found but couldn't load: {e}")
-                    continue  # Try next path
-        
-        if not video_found:
-            # If no video found, show a message
-            st.info("🚚 Company logo video not found - please ensure company_logo_animation.mp4 is in assets/videos/")
+                    st.video(str(video_path), format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
+                except:
+                    st.info("🚚 Smith & Williams Trucking")
+        else:
+            # For Streamlit Cloud, try using the video without checking if it exists
+            try:
+                # This should work on Streamlit Cloud where file exists but Path.exists() may fail
+                st.video("assets/videos/company_logo_animation.mp4.MOV", format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
+            except:
+                st.info("🚚 Smith & Williams Trucking")
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
