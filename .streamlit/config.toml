@@ -9,8 +9,8 @@ font = "sans serif"
 [server]
 # Server Configuration
 maxUploadSize = 200                # Max file upload size in MB
-enableCORS = false
-enableXsrfProtection = true
+enableCORS = true
+enableXsrfProtection = false
 headless = true                     # Required for cloud deployment
 
 [browser]
