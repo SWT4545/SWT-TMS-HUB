@@ -80,14 +80,21 @@ class FloridaAssistant:
             self.display_message("Perfect! Let's start with the Load ID. What's the unique identifier for this load?")
             
             load_id = st.text_input("Load ID:", key="load_id_input")
-            if st.button("Continue", key="load_id_continue"):
-                if load_id:
-                    st.session_state.florida_data['load_id'] = load_id
-                    st.session_state.florida_state = 'ask_dates'
-                    self.save_chat_message("user", f"Load ID: {load_id}")
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("Continue", key="load_id_continue", type="primary"):
+                    if load_id:
+                        st.session_state.florida_data['load_id'] = load_id
+                        st.session_state.florida_state = 'ask_dates'
+                        self.save_chat_message("user", f"Load ID: {load_id}")
+                        st.rerun()
+                    else:
+                        st.error("Please enter a Load ID")
+            with col2:
+                if st.button("❌ Cancel", key="load_id_cancel"):
+                    st.session_state.florida_state = 'greeting'
+                    st.session_state.florida_data = {}
                     st.rerun()
-                else:
-                    st.error("Please enter a Load ID")
         
         elif st.session_state.florida_state == 'ask_dates':
             self.display_message(f"Great! Load ID {st.session_state.florida_data['load_id']} recorded. Now, what are the pickup and delivery dates?")
@@ -98,11 +105,18 @@ class FloridaAssistant:
             with col2:
                 delivery_date = st.date_input("Delivery Date:", key="delivery_date_input")
             
-            if st.button("Continue", key="dates_continue"):
-                st.session_state.florida_data['pickup_date'] = pickup_date
-                st.session_state.florida_data['delivery_date'] = delivery_date
-                st.session_state.florida_state = 'ask_parties'
-                st.rerun()
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("Continue", key="dates_continue", type="primary"):
+                    st.session_state.florida_data['pickup_date'] = pickup_date
+                    st.session_state.florida_data['delivery_date'] = delivery_date
+                    st.session_state.florida_state = 'ask_parties'
+                    st.rerun()
+            with col2:
+                if st.button("❌ Cancel", key="dates_cancel"):
+                    st.session_state.florida_state = 'greeting'
+                    st.session_state.florida_data = {}
+                    st.rerun()
         
         elif st.session_state.florida_state == 'ask_parties':
             self.display_message("Now let's identify the parties. Who's the carrier and customer for this load?")
@@ -115,14 +129,21 @@ class FloridaAssistant:
             with col2:
                 customer = st.text_input("Customer:", key="customer_input")
             
-            if st.button("Continue", key="parties_continue"):
-                if carrier and customer:
-                    st.session_state.florida_data['carrier'] = carrier
-                    st.session_state.florida_data['customer'] = customer
-                    st.session_state.florida_state = 'ask_locations'
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("Continue", key="parties_continue", type="primary"):
+                    if carrier and customer:
+                        st.session_state.florida_data['carrier'] = carrier
+                        st.session_state.florida_data['customer'] = customer
+                        st.session_state.florida_state = 'ask_locations'
+                        st.rerun()
+                    else:
+                        st.error("Please enter both carrier and customer")
+            with col2:
+                if st.button("❌ Cancel", key="parties_cancel"):
+                    st.session_state.florida_state = 'greeting'
+                    st.session_state.florida_data = {}
                     st.rerun()
-                else:
-                    st.error("Please enter both carrier and customer")
         
         elif st.session_state.florida_state == 'ask_locations':
             self.display_message("Let's get the pickup and delivery addresses.")

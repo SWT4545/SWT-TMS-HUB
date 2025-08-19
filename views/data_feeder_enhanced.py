@@ -92,28 +92,35 @@ def show_payment_reconciliation():
     
     st.subheader("💰 Intelligent Payment Reconciliation")
     
-    # Payment entry form
+    # Payment entry form with auto-clear
     with st.expander("➕ Record New Payment", expanded=True):
-        col1, col2, col3 = st.columns(3)
+        with st.form("payment_form", clear_on_submit=True):
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                payment_amount = st.number_input("Payment Amount ($)", min_value=0.0, format="%.2f")
+            
+            with col2:
+                payment_date = st.date_input("Payment Date", value=datetime.now())
+            
+            with col3:
+                paying_entity = st.selectbox(
+                    "Paying Entity",
+                    ["CanAmex", "Factoring Company", "Direct Customer", "Other"]
+                )
+                if paying_entity == "Other":
+                    paying_entity = st.text_input("Specify Entity")
+            
+            reference_number = st.text_input("Reference/Check Number (Optional)")
+            notes = st.text_area("Notes (Optional)")
+            
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                submit_button = st.form_submit_button("🔍 Find Matching Loads", type="primary", use_container_width=True)
+            with col2:
+                cancel_button = st.form_submit_button("❌ Cancel", use_container_width=True)
         
-        with col1:
-            payment_amount = st.number_input("Payment Amount ($)", min_value=0.0, format="%.2f")
-        
-        with col2:
-            payment_date = st.date_input("Payment Date", value=datetime.now())
-        
-        with col3:
-            paying_entity = st.selectbox(
-                "Paying Entity",
-                ["CanAmex", "Factoring Company", "Direct Customer", "Other"]
-            )
-            if paying_entity == "Other":
-                paying_entity = st.text_input("Specify Entity")
-        
-        reference_number = st.text_input("Reference/Check Number (Optional)")
-        notes = st.text_area("Notes (Optional)")
-        
-        if st.button("🔍 Find Matching Loads", type="primary"):
+        if submit_button:
             if payment_amount > 0 and paying_entity:
                 # Get payment schedule for carrier
                 schedule = get_carrier_payment_schedule(paying_entity)

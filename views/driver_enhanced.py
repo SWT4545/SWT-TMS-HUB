@@ -180,19 +180,27 @@ def show_current_load():
                 # Open navigation (placeholder)
                 st.info(f"Opening navigation to {load['delivery_address']}")
         
-        # Report delay button
+        # Report delay button with form auto-clear
         if load['status'] in ['in_transit', 'at_pickup', 'at_delivery']:
             with st.expander("⚠️ Report Delay"):
-                delay_reason = st.text_area("Delay Reason:")
-                delay_duration = st.number_input("Estimated Delay (minutes):", min_value=0, step=15)
-                
-                if st.button("Submit Delay Report"):
-                    if delay_reason:
-                        report_delay(load['id'], delay_reason, delay_duration)
-                        st.success("Delay reported successfully")
-                        st.rerun()
-                    else:
-                        st.error("Please provide a delay reason")
+                with st.form("delay_form", clear_on_submit=True):
+                    delay_reason = st.text_area("Delay Reason:")
+                    delay_duration = st.number_input("Estimated Delay (minutes):", min_value=0, step=15)
+                    
+                    col1, col2 = st.columns([1, 1])
+                    with col1:
+                        submit = st.form_submit_button("Submit Delay Report", type="primary", use_container_width=True)
+                    with col2:
+                        cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
+                    
+                    if submit:
+                        if delay_reason:
+                            report_delay(load['id'], delay_reason, delay_duration)
+                            st.success("Delay reported successfully")
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("Please provide a delay reason")
     else:
         st.info("📭 No active loads assigned. Check back later or contact dispatch.")
         
@@ -272,34 +280,42 @@ def show_checkin_interface():
         else:
             st.success(f"✅ Completed delivery at {load['delivery_departure_time']}")
     
-    # Manual time entry option
+    # Manual time entry option with form auto-clear
     with st.expander("⏰ Manual Time Entry"):
         st.info("Use this if automatic check-in is not working")
         
-        event_type = st.selectbox(
-            "Event Type",
-            ["Pickup Arrival", "Pickup Departure", "Delivery Arrival", "Delivery Departure"]
-        )
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            event_date = st.date_input("Date", value=datetime.now())
-        with col2:
-            event_time = st.time_input("Time", value=datetime.now().time())
-        
-        if st.button("Save Manual Entry"):
-            timestamp = datetime.combine(event_date, event_time)
+        with st.form("manual_time_form", clear_on_submit=True):
+            event_type = st.selectbox(
+                "Event Type",
+                ["Pickup Arrival", "Pickup Departure", "Delivery Arrival", "Delivery Departure"]
+            )
             
-            field_map = {
-                "Pickup Arrival": "pickup_arrival",
-                "Pickup Departure": "pickup_departure",
-                "Delivery Arrival": "delivery_arrival",
-                "Delivery Departure": "delivery_departure"
-            }
+            col1, col2 = st.columns(2)
+            with col1:
+                event_date = st.date_input("Date", value=datetime.now())
+            with col2:
+                event_time = st.time_input("Time", value=datetime.now().time())
             
-            check_in_at_location(load_id, field_map[event_type], timestamp)
-            st.success(f"✅ {event_type} recorded at {timestamp}")
-            st.rerun()
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                save_button = st.form_submit_button("Save Manual Entry", type="primary", use_container_width=True)
+            with col2:
+                cancel_button = st.form_submit_button("❌ Cancel", use_container_width=True)
+            
+            if save_button:
+                timestamp = datetime.combine(event_date, event_time)
+                
+                field_map = {
+                    "Pickup Arrival": "pickup_arrival",
+                    "Pickup Departure": "pickup_departure",
+                    "Delivery Arrival": "delivery_arrival",
+                    "Delivery Departure": "delivery_departure"
+                }
+                
+                check_in_at_location(load_id, field_map[event_type], timestamp)
+                st.success(f"✅ {event_type} recorded at {timestamp}")
+                time.sleep(1)
+                st.rerun()
 
 
 def show_document_upload():

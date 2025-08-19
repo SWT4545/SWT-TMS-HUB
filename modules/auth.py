@@ -129,11 +129,23 @@ def show_login():
                 logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
                 
                 try:
-                    # Try to display using Streamlit's video player
+                    # Display video with HTML5 for loop and muted autoplay
                     with open(video_path, 'rb') as video_file:
                         video_bytes = video_file.read()
-                        st.video(video_bytes, format="video/mp4")
-                        logger.info("Video displayed using Streamlit player")
+                        video_b64 = base64.b64encode(video_bytes).decode()
+                        
+                        # HTML5 video with autoplay, muted, and loop
+                        video_html = f'''
+                        <div style="display: flex; justify-content: center; margin: 20px 0;">
+                            <video width="400" height="300" autoplay muted loop playsinline style="border-radius: 10px;">
+                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        '''
+                        st.markdown(video_html, unsafe_allow_html=True)
+                        logger.info("Video displayed with loop and muted")
                         break
                 except Exception as e:
                     logger.error(f"Error displaying video: {e}")

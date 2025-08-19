@@ -278,14 +278,22 @@ def apply_global_styles():
 
 def show_sidebar():
     """Display sidebar with navigation and user info"""
+    from pathlib import Path
+    
     with st.sidebar:
-        # Company branding
-        st.markdown("""
-        <div style='text-align: center; padding: 1rem; background: #8B0000; border-radius: 10px; margin-bottom: 1rem; border: 3px solid white;'>
-            <h2 style='margin: 0; color: white; font-weight: 900;'>🚚 SWT</h2>
-            <p style='margin: 0; color: white; font-size: 0.9rem; font-weight: 700;'>Smith & Williams Trucking</p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Display SWT Logo at top of sidebar
+        logo_path = Path("assets/logos/swt_logo_white.png")
+        if logo_path.exists():
+            st.image(str(logo_path), use_container_width=True)
+            st.markdown("---")
+        else:
+            # Fallback to text branding if logo not found
+            st.markdown("""
+            <div style='text-align: center; padding: 1rem; background: #8B0000; border-radius: 10px; margin-bottom: 1rem; border: 3px solid white;'>
+                <h2 style='margin: 0; color: white; font-weight: 900;'>🚚 SWT</h2>
+                <p style='margin: 0; color: white; font-size: 0.9rem; font-weight: 700;'>Smith & Williams Trucking</p>
+            </div>
+            """, unsafe_allow_html=True)
         
         # User info
         if 'user_full_name' in st.session_state:
