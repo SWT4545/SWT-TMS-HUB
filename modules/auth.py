@@ -103,24 +103,41 @@ def show_login():
         video_paths = [
             Path("assets/videos/company_logo_animation.mp4.MOV"),
             Path("assets") / "videos" / "company_logo_animation.mp4.MOV",
-            Path("config") / "company_logo_animation.mp4.MOV",  # Check config folder as mentioned
-            Path("templates") / "company_logo_animation.mp4.MOV"
+            Path("assets/videos/company_logo_animation.mp4"),
+            Path("assets") / "videos" / "company_logo_animation.mp4"
         ]
         
+        video_found = False
         for video_path in video_paths:
             if video_path.exists():
-                # Display the company logo animation video
+                # Display the company logo animation video with HTML5 video tag for better control
                 try:
                     with open(video_path, 'rb') as video_file:
                         video_bytes = video_file.read()
+                        video_b64 = base64.b64encode(video_bytes).decode()
                         
-                        # Use Streamlit's native video player
-                        st.video(video_bytes, format="video/mp4", start_time=0)
+                        # Use HTML5 video with autoplay, muted, and loop
+                        video_html = f'''
+                        <div style="display: flex; justify-content: center; margin: 20px 0;">
+                            <video width="400" autoplay muted loop playsinline style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        '''
+                        st.markdown(video_html, unsafe_allow_html=True)
+                        video_found = True
                         break  # Stop once video is displayed
                         
                 except Exception as e:
                     # Video failed to load
+                    st.warning(f"Video found but couldn't load: {e}")
                     continue  # Try next path
+        
+        if not video_found:
+            # If no video found, show a message
+            st.info("🚚 Company logo video not found - please ensure company_logo_animation.mp4 is in assets/videos/")
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
