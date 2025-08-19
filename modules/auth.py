@@ -7,8 +7,13 @@ import hashlib
 import base64
 import os
 import time
+import logging
 from datetime import datetime
 from pathlib import Path
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 DB_PATH = "swt_tms.db"
 
@@ -99,32 +104,55 @@ def show_login():
         # PRIORITY: Display video first, fallback to logo if needed
         # ONLY ONE WILL DISPLAY - NEVER BOTH
         
-        # Try to display the video using direct file access
-        video_path = Path("assets/videos/company_logo_animation.mp4.MOV")
+        # Log current working directory and check for video
+        logger.info(f"Current working directory: {os.getcwd()}")
+        logger.info(f"Looking for video file...")
         
-        # Check if file exists locally
-        if video_path.exists():
-            try:
-                # Read and encode video for display
-                with open(video_path, 'rb') as video_file:
-                    video_bytes = video_file.read()
-                    
-                # Use Streamlit's native video player with loop functionality
-                st.video(video_bytes, format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
-                    
-            except Exception as e:
-                # If reading fails, try using the file directly
+        # Check multiple possible paths
+        video_paths = [
+            "assets/videos/company_logo_animation.mp4.MOV",
+            "assets/videos/company_logo_animation.mp4",
+            "./assets/videos/company_logo_animation.mp4.MOV",
+            os.path.join(os.getcwd(), "assets", "videos", "company_logo_animation.mp4.MOV")
+        ]
+        
+        video_found = False
+        for vp in video_paths:
+            video_path = Path(vp)
+            logger.info(f"Checking path: {vp}")
+            logger.info(f"Path exists: {video_path.exists()}")
+            logger.info(f"Absolute path: {video_path.absolute()}")
+            
+            if video_path.exists():
+                video_found = True
+                logger.info(f"Video found at: {video_path.absolute()}")
+                logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
+                
                 try:
-                    st.video(str(video_path), format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
-                except:
-                    st.info("🚚 Smith & Williams Trucking")
-        else:
-            # For Streamlit Cloud, try using the video without checking if it exists
+                    # Try to display using Streamlit's video player
+                    with open(video_path, 'rb') as video_file:
+                        video_bytes = video_file.read()
+                        st.video(video_bytes, format="video/mp4")
+                        logger.info("Video displayed using Streamlit player")
+                        break
+                except Exception as e:
+                    logger.error(f"Error displaying video: {e}")
+                    st.error(f"Error loading video: {e}")
+        
+        if not video_found:
+            logger.warning("Video file not found at any expected location")
+            # List files in assets directory for debugging
             try:
-                # This should work on Streamlit Cloud where file exists but Path.exists() may fail
-                st.video("assets/videos/company_logo_animation.mp4.MOV", format="video/mp4", start_time=0, loop=True, autoplay=True, muted=True)
-            except:
-                st.info("🚚 Smith & Williams Trucking")
+                assets_path = Path("assets")
+                if assets_path.exists():
+                    logger.info(f"Contents of assets directory: {list(assets_path.iterdir())}")
+                    videos_path = assets_path / "videos"
+                    if videos_path.exists():
+                        logger.info(f"Contents of assets/videos: {list(videos_path.iterdir())}")
+            except Exception as e:
+                logger.error(f"Error listing directory contents: {e}")
+            
+            st.info("🚚 Smith & Williams Trucking")
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
