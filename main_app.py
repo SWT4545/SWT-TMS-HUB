@@ -26,6 +26,7 @@ sys.path.insert(0, str(project_root))
 from config.database import init_database
 from modules.auth import show_login, check_authentication, logout
 from modules.ui_components import apply_global_styles, show_sidebar
+from modules.mobile_optimization import optimize_for_mobile
 from views.executive import show_executive_view
 from views.data_entry import show_data_feeder_view
 from views.driver import show_driver_view
@@ -59,6 +60,9 @@ def main():
     
     # Apply global styling
     apply_global_styles()
+    
+    # Apply mobile optimizations
+    optimize_for_mobile()
     
     # Initialize app
     initialize_app()
