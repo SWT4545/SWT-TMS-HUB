@@ -107,44 +107,20 @@ def show_login():
             Path("templates") / "company_logo_animation.mp4.MOV"
         ]
         
-        video_displayed = False
-        
         for video_path in video_paths:
             if video_path.exists():
-                # VIDEO IS PRIORITY - Try to display the company logo animation
+                # Display the company logo animation video
                 try:
                     with open(video_path, 'rb') as video_file:
                         video_bytes = video_file.read()
                         
-                        # Use Streamlit's native video player (cleaner, no duplicate)
+                        # Use Streamlit's native video player
                         st.video(video_bytes, format="video/mp4", start_time=0)
-                        video_displayed = True
                         break  # Stop once video is displayed
                         
                 except Exception as e:
                     # Video failed to load
                     continue  # Try next path
-        
-        # ONLY show logo if video was NOT displayed
-        if not video_displayed:
-            # FALLBACK: Show logo since video didn't work
-            logo_paths = [
-                Path("assets/logos/swt_logo_white.png"),
-                Path("assets") / "logos" / "swt_logo_white.png",
-                Path("assets/logos/swt_logo.png"),
-                Path("assets") / "logos" / "swt_logo.png"
-            ]
-            
-            logo_displayed = False
-            for logo_path in logo_paths:
-                if logo_path.exists():
-                    st.image(str(logo_path), use_container_width=True)
-                    logo_displayed = True
-                    break
-            
-            if not logo_displayed:
-                # Show placeholder if nothing found
-                st.info("🚚 Smith & Williams Trucking")
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
