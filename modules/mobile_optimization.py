@@ -214,10 +214,10 @@ def apply_mobile_styles():
             }
         }
         
-        /* Vernon Protection Badge - mobile optimized */
+        /* Vernon Protection Badge - mobile optimized (top right position) */
         @media screen and (max-width: 768px) {
             .vernon-protection {
-                bottom: 5px !important;
+                top: 55px !important;
                 right: 5px !important;
                 padding: 6px 10px !important;
                 font-size: 9px !important;

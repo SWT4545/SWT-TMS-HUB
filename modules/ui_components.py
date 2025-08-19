@@ -283,10 +283,10 @@ def apply_global_styles():
             border-radius: 8px !important;
         }
         
-        /* Vernon Protection Badge */
+        /* Vernon Protection Badge - Relocated to top right */
         .vernon-protection {
             position: fixed;
-            bottom: 10px;
+            top: 70px;
             right: 10px;
             background: #8B0000;
             color: white;
