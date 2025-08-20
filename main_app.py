@@ -93,6 +93,9 @@ def show_main_interface():
     elif current_view == 'ai_assistant':
         from views.intelligent_assistant import show_intelligent_assistant
         show_intelligent_assistant()
+    elif current_view == 'learning_center':
+        from views.learning_center import show_learning_center
+        show_learning_center()
     elif current_view == 'comprehensive_management':
         from views.comprehensive_management import show_comprehensive_management
         show_comprehensive_management()

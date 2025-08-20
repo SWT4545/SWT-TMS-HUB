@@ -370,6 +370,11 @@ def show_sidebar():
             st.session_state.current_view = 'ai_assistant'
             st.rerun()
         
+        # Learning Center - Available to all
+        if st.button("🎓 Learning Center", use_container_width=True):
+            st.session_state.current_view = 'learning_center'
+            st.rerun()
+        
         # Executive Dashboard
         if role in ['super_user', 'ceo', 'executive', 'admin']:
             if st.button("📊 Executive Dashboard", use_container_width=True):
