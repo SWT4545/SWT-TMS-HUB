@@ -363,20 +363,47 @@ def show_sidebar():
         st.markdown("### 📍 Navigation")
         
         role = st.session_state.get('role', 'guest')
+        username = st.session_state.get('username', '')
         
-        if role in ['super_user', 'executive', 'admin']:
+        # AI Assistant - Available to all
+        if st.button("🤖 AI Assistant", use_container_width=True):
+            st.session_state.current_view = 'ai_assistant'
+            st.rerun()
+        
+        # Executive Dashboard
+        if role in ['super_user', 'ceo', 'executive', 'admin']:
             if st.button("📊 Executive Dashboard", use_container_width=True):
                 st.session_state.current_view = 'executive'
                 st.rerun()
         
+        # Comprehensive Management (All Business Functions)
+        if role in ['super_user', 'ceo', 'admin']:
+            if st.button("🎛️ Management Center", use_container_width=True):
+                st.session_state.current_view = 'comprehensive_management'
+                st.rerun()
+        
+        # CEO Personal Management
+        if username == 'Brandon' or role in ['super_user', 'ceo']:
+            if st.button("👔 Personal Management", use_container_width=True):
+                st.session_state.current_view = 'personal_management'
+                st.rerun()
+        
+        # Data Entry (Legacy)
         if role in ['super_user', 'data_feeder', 'admin']:
             if st.button("📝 Data Entry", use_container_width=True):
                 st.session_state.current_view = 'data_feeder'
                 st.rerun()
         
+        # Driver Portal
         if role in ['super_user', 'driver']:
             if st.button("🚛 Driver Portal", use_container_width=True):
                 st.session_state.current_view = 'driver'
+                st.rerun()
+        
+        # User Management
+        if role in ['super_user', 'ceo', 'admin']:
+            if st.button("👥 User Management", use_container_width=True):
+                st.session_state.current_view = 'user_management'
                 st.rerun()
         
         st.markdown("---")

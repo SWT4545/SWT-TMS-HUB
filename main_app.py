@@ -90,6 +90,15 @@ def show_main_interface():
     # Route to appropriate view based on selection
     if current_view == 'dashboard':
         show_executive_view()
+    elif current_view == 'ai_assistant':
+        from views.intelligent_assistant import show_intelligent_assistant
+        show_intelligent_assistant()
+    elif current_view == 'comprehensive_management':
+        from views.comprehensive_management import show_comprehensive_management
+        show_comprehensive_management()
+    elif current_view == 'personal_management' and user_role in ['super_user', 'ceo']:
+        from views.ceo_personal_management import show_ceo_personal_management
+        show_ceo_personal_management()
     elif current_view == 'shipments':
         show_shipments_view()
     elif current_view == 'data_entry' or current_view == 'data_feeder':
