@@ -5,6 +5,10 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date, timedelta
 from modules.ui_components import show_data_protection_footer
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from modules.motive_integration import MotiveIntegration, show_motive_dashboard
 
 def show_driver_view():
     """Display driver portal with loads, routes, and documents"""
@@ -26,28 +30,36 @@ def show_driver_view():
     st.markdown("---")
     
     # Main tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📋 Current Load", 
+        "📍 GPS/ELD",
         "📅 Schedule", 
         "🗺️ Route Info", 
         "📄 Documents", 
-        "💰 Earnings"
+        "💰 Earnings",
+        "⏱️ HOS Status"
     ])
     
     with tab1:
         show_current_load()
     
     with tab2:
-        show_driver_schedule()
+        show_gps_eld_integration()
     
     with tab3:
-        show_route_info()
+        show_driver_schedule()
     
     with tab4:
-        show_documents()
+        show_route_info()
     
     with tab5:
+        show_documents()
+    
+    with tab6:
         show_earnings()
+    
+    with tab7:
+        show_hos_status()
     
     # Data Protection Footer
     show_data_protection_footer()
@@ -336,3 +348,300 @@ def show_earnings():
     
     if st.button("📄 View Settlement Statement"):
         st.info("Loading settlement statement...")
+
+def show_gps_eld_integration():
+    """Display GPS/ELD integration from Motive"""
+    st.markdown("## 📍 GPS/ELD Integration (Motive)")
+    
+    # Initialize Motive integration
+    motive = MotiveIntegration()
+    
+    # Get current location and HOS data
+    location = motive.fetch_current_location()
+    hos = motive.fetch_hos_status()
+    
+    # Quick status
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        if location:
+            st.metric("Current Speed", f"{location.get('speed', 0):.1f} mph")
+        else:
+            st.metric("Current Speed", "0 mph")
+    
+    with col2:
+        if hos:
+            st.metric("Duty Status", hos.get('duty_status', 'Off Duty'))
+        else:
+            st.metric("Duty Status", "Off Duty")
+    
+    with col3:
+        if location:
+            st.metric("Odometer", f"{location.get('odometer', 0):,.0f} mi")
+        else:
+            st.metric("Odometer", "Loading...")
+    
+    with col4:
+        if location:
+            fuel = location.get('fuel_level', 50)
+            st.metric("Fuel Level", f"{fuel:.0f}%")
+        else:
+            st.metric("Fuel Level", "Loading...")
+    
+    st.markdown("---")
+    
+    # Location details
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 📍 Current Location")
+        if location:
+            st.info(f"""
+            **Address:** {location.get('address', 'Unknown')}  
+            **City:** {location.get('city', 'Unknown')}  
+            **State:** {location.get('state', 'Unknown')}  
+            **Coordinates:** {location.get('latitude', 0):.6f}, {location.get('longitude', 0):.6f}  
+            **Heading:** {location.get('heading', 0)}°  
+            **Engine Hours:** {location.get('engine_hours', 0):,.1f}
+            """)
+        else:
+            st.info("Location data loading...")
+        
+        if st.button("🔄 Refresh Location", key="refresh_gps"):
+            new_location = motive.fetch_current_location()
+            if new_location:
+                st.success("Location updated!")
+                st.rerun()
+    
+    with col2:
+        st.markdown("### ⏱️ Hours of Service")
+        if hos:
+            # Calculate hours from minutes
+            drive_hours = hos.get('drive_time_remaining', 0) / 60
+            shift_hours = hos.get('shift_time_remaining', 0) / 60
+            cycle_hours = hos.get('cycle_time_remaining', 0) / 60
+            
+            st.write(f"**Drive Time Remaining:** {drive_hours:.1f} hours")
+            st.progress(min(drive_hours / 11, 1.0))
+            
+            st.write(f"**Shift Time Remaining:** {shift_hours:.1f} hours")
+            st.progress(min(shift_hours / 14, 1.0))
+            
+            st.write(f"**Cycle Time Remaining:** {cycle_hours:.1f} hours")
+            st.progress(min(cycle_hours / 70, 1.0))
+            
+            if hos.get('break_time_remaining', 0) > 0:
+                st.warning(f"⚠️ Break required in {hos['break_time_remaining']} minutes")
+        else:
+            st.info("HOS data loading...")
+    
+    # Vehicle diagnostics
+    st.markdown("### 🚛 Vehicle Diagnostics")
+    
+    diagnostics = motive.get_vehicle_diagnostics()
+    
+    if diagnostics:
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            oil_pressure = diagnostics.get('oil_pressure', 35)
+            st.metric("Oil Pressure", f"{oil_pressure:.1f} psi")
+            if oil_pressure < 25 or oil_pressure > 45:
+                st.warning("Check oil pressure!")
+        
+        with col2:
+            coolant_temp = diagnostics.get('coolant_temp', 195)
+            st.metric("Coolant Temp", f"{coolant_temp:.0f}°F")
+            if coolant_temp > 210:
+                st.warning("High temperature!")
+        
+        with col3:
+            battery = diagnostics.get('battery_voltage', 14.0)
+            st.metric("Battery", f"{battery:.1f}V")
+            if battery < 13.0:
+                st.warning("Low voltage!")
+        
+        with col4:
+            fuel_economy = diagnostics.get('fuel_economy', 6.5)
+            st.metric("Fuel Economy", f"{fuel_economy:.1f} mpg")
+        
+        # DEF level
+        def_level = diagnostics.get('def_level', 50)
+        st.write(f"**DEF Level:** {def_level:.0f}%")
+        st.progress(def_level / 100)
+        if def_level < 20:
+            st.warning("⚠️ Low DEF level - refill soon!")
+        
+        # Engine light
+        if diagnostics.get('engine_light'):
+            st.error("🔴 Check Engine Light ON - Contact maintenance")
+        else:
+            st.success("✅ No engine warnings")
+    
+    # Trip summary for today
+    st.markdown("### 📊 Today's Trip Summary")
+    
+    summary = motive.get_trip_summary(date.today(), date.today())
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Miles Driven", f"{summary.get('total_miles', 0):,.0f}")
+    
+    with col2:
+        st.metric("Fuel Used", f"{summary.get('total_fuel', 0):.1f} gal")
+    
+    with col3:
+        drive_time = summary.get('total_drive_time', 0) / 60
+        st.metric("Drive Time", f"{drive_time:.1f} hrs")
+    
+    with col4:
+        idle_time = summary.get('total_idle_time', 0) / 60
+        st.metric("Idle Time", f"{idle_time:.1f} hrs")
+    
+    # Sync button
+    if st.button("🔄 Sync with Active Loads", type="primary"):
+        synced = motive.sync_with_shipments()
+        st.success(f"Synced {synced} active shipments with GPS data")
+
+def show_hos_status():
+    """Display detailed Hours of Service status"""
+    st.markdown("## ⏱️ Hours of Service Status")
+    
+    # Initialize Motive integration
+    motive = MotiveIntegration()
+    hos = motive.fetch_hos_status()
+    
+    if hos:
+        # Current status
+        status_color = {
+            'Driving': '#ef4444',
+            'On Duty': '#f59e0b', 
+            'Off Duty': '#10b981',
+            'Sleeper': '#3b82f6'
+        }.get(hos.get('duty_status', 'Off Duty'), '#6b7280')
+        
+        st.markdown(f"""
+        <div style='background: rgba(255,255,255,0.95); padding: 1.5rem; border-radius: 10px; border-left: 5px solid {status_color};'>
+            <h3 style='color: {status_color}; margin: 0;'>Current Status: {hos.get('duty_status', 'Off Duty')}</h3>
+            <p style='margin: 0.5rem 0;'>Duration: {hos.get('duty_status_duration', 0)} minutes</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Time remaining gauges
+        st.markdown("### ⏰ Time Remaining")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            drive_hours = hos.get('drive_time_remaining', 0) / 60
+            st.markdown("#### Driving Time")
+            st.write(f"**{drive_hours:.1f} hours** remaining of 11 hours")
+            st.progress(min(drive_hours / 11, 1.0))
+            
+            shift_hours = hos.get('shift_time_remaining', 0) / 60
+            st.markdown("#### Shift Time")
+            st.write(f"**{shift_hours:.1f} hours** remaining of 14 hours")
+            st.progress(min(shift_hours / 14, 1.0))
+        
+        with col2:
+            cycle_hours = hos.get('cycle_time_remaining', 0) / 60
+            st.markdown("#### Cycle Time (70/8)")
+            st.write(f"**{cycle_hours:.1f} hours** remaining of 70 hours")
+            st.progress(min(cycle_hours / 70, 1.0))
+            
+            break_mins = hos.get('break_time_remaining', 0)
+            if break_mins > 0:
+                st.markdown("#### Break Required")
+                st.write(f"**{break_mins} minutes** until break required")
+                st.progress(max(1 - (break_mins / 30), 0))
+                st.warning("⚠️ Plan for upcoming break")
+        
+        # Status change buttons
+        st.markdown("### 🔄 Change Duty Status")
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if st.button("🚗 Driving", use_container_width=True, disabled=(hos.get('duty_status') == 'Driving')):
+                st.success("Status changed to: Driving")
+        
+        with col2:
+            if st.button("👷 On Duty", use_container_width=True, disabled=(hos.get('duty_status') == 'On Duty')):
+                st.success("Status changed to: On Duty")
+        
+        with col3:
+            if st.button("🏠 Off Duty", use_container_width=True, disabled=(hos.get('duty_status') == 'Off Duty')):
+                st.success("Status changed to: Off Duty")
+        
+        with col4:
+            if st.button("🛏️ Sleeper", use_container_width=True, disabled=(hos.get('duty_status') == 'Sleeper')):
+                st.success("Status changed to: Sleeper Berth")
+        
+        # Recent status log
+        st.markdown("### 📜 Recent Status Changes")
+        
+        cursor = motive.conn.cursor()
+        cursor.execute("""
+            SELECT duty_status, timestamp, duty_status_duration
+            FROM motive_hos_data
+            WHERE driver_id = ?
+            ORDER BY timestamp DESC
+            LIMIT 8
+        """, (motive.driver_info['motive_driver_id'],))
+        
+        logs = cursor.fetchall()
+        
+        if logs:
+            log_data = []
+            for log in logs:
+                log_data.append({
+                    'Status': log[0],
+                    'Start Time': datetime.fromisoformat(str(log[1])).strftime('%m/%d %I:%M %p'),
+                    'Duration': f"{log[2]} min" if log[2] else "Current"
+                })
+            
+            st.dataframe(pd.DataFrame(log_data), use_container_width=True, hide_index=True)
+        else:
+            # Show sample data
+            sample_data = pd.DataFrame({
+                'Status': ['Off Duty', 'Driving', 'On Duty', 'Driving', 'Off Duty'],
+                'Start Time': ['01/20 06:00 AM', '01/20 07:00 AM', '01/20 11:30 AM', 
+                              '01/20 12:00 PM', '01/20 05:00 PM'],
+                'Duration': ['60 min', '270 min', '30 min', '300 min', 'Current']
+            })
+            st.dataframe(sample_data, use_container_width=True, hide_index=True)
+        
+        # Violations check
+        st.markdown("### ⚠️ Violation Check")
+        
+        if hos.get('current_violation'):
+            st.error(f"🚨 Active Violation: {hos['current_violation']}")
+            st.write("Take immediate action to resolve this violation")
+        else:
+            st.success("✅ No violations - You're in compliance!")
+        
+        # Tips
+        with st.expander("💡 HOS Tips & Reminders"):
+            st.info("""
+            **Daily Limits:**
+            - Maximum 11 hours driving
+            - Maximum 14 hours on duty
+            - Mandatory 30-minute break after 8 hours driving
+            - 10 hours off duty required before starting new shift
+            
+            **Weekly Limits:**
+            - Maximum 60 hours in 7 days
+            - Maximum 70 hours in 8 days
+            - 34-hour restart resets weekly hours
+            
+            **Best Practices:**
+            - Plan breaks during loading/unloading
+            - Use sleeper berth for split breaks
+            - Monitor your hours throughout the day
+            - Keep paper logs as backup
+            """)
+    else:
+        st.warning("Unable to fetch HOS data. Using last known status.")

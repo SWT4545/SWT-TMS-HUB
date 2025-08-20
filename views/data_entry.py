@@ -5,6 +5,8 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date
 from modules.ui_components import show_data_protection_footer
+from modules.ui_enhancements import add_cancel_button, confirmation_dialog, auto_save_form
+from modules.api_integrations import GoogleMapsAPI
 
 def show_data_feeder_view():
     """Display data entry interface for loads, drivers, and customers"""
@@ -34,6 +36,9 @@ def show_load_entry():
     """Load entry form"""
     st.markdown("## Create New Load")
     
+    # Initialize Google Maps API
+    gmaps = GoogleMapsAPI()
+    
     with st.form("new_load_form"):
         col1, col2 = st.columns(2)
         
@@ -62,15 +67,55 @@ def show_load_entry():
             weight = st.number_input("Weight (lbs)", min_value=0)
             rate = st.number_input("Rate ($)", min_value=0.0, format="%.2f")
         
+        # Calculate distance if addresses provided
+        if pickup_address and pickup_city and delivery_address and delivery_city:
+            origin = f"{pickup_address}, {pickup_city}, {pickup_state}"
+            destination = f"{delivery_address}, {delivery_city}, {delivery_state}"
+            
+            distance_info = gmaps.calculate_distance(origin, destination)
+            
+            if 'error' not in distance_info:
+                st.info(f"""
+                📏 **Distance:** {distance_info.get('distance_text', 'N/A')}  
+                ⏱️ **Est. Drive Time:** {distance_info.get('duration_text', 'N/A')}  
+                💰 **Rate per Mile:** ${rate / distance_info.get('distance_miles', 1):.2f}/mi
+                """)
+        
         st.markdown("### 📝 Additional Information")
         special_instructions = st.text_area("Special Instructions", height=100)
         
         col1, col2, col3 = st.columns(3)
+        with col1:
+            cancel = st.form_submit_button("❌ Cancel", use_container_width=True)
         with col2:
+            save_draft = st.form_submit_button("💾 Save Draft", use_container_width=True)
+        with col3:
             submitted = st.form_submit_button("✅ Create Load", type="primary", use_container_width=True)
         
+        if cancel:
+            st.warning("Load creation cancelled")
+            st.session_state.clear()
+            st.rerun()
+        
+        if save_draft:
+            # Auto-save functionality
+            form_data = {
+                'load_number': load_number,
+                'customer': customer,
+                'pickup_date': pickup_date,
+                'pickup_address': pickup_address,
+                'delivery_address': delivery_address,
+                'rate': rate
+            }
+            auto_save_form("load_entry", form_data)
+            st.info("Draft saved!")
+        
         if submitted:
-            st.success(f"✅ Load {load_number} created successfully!")
+            # Confirmation dialog
+            if confirmation_dialog(f"Create load {load_number}?"):
+                st.success(f"✅ Load {load_number} created successfully!")
+            else:
+                st.info("Load creation cancelled")
 
 def show_driver_entry():
     """Driver information entry form"""

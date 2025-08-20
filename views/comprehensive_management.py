@@ -8,6 +8,8 @@ from datetime import datetime, date, timedelta
 import pandas as pd
 from config.database import get_connection
 import hashlib
+from modules.ui_enhancements import add_cancel_button, confirmation_dialog, process_with_cancel
+from modules.api_integrations import GoogleMapsAPI
 
 def show_comprehensive_management():
     """Main comprehensive management interface"""
