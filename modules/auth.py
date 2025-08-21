@@ -117,57 +117,62 @@ def show_login():
         ]
         
         video_found = False
-        for vp in video_paths:
-            video_path = Path(vp)
-            logger.info(f"Checking path: {vp}")
-            logger.info(f"Path exists: {video_path.exists()}")
-            logger.info(f"Absolute path: {video_path.absolute()}")
-            
-            if video_path.exists():
-                video_found = True
-                logger.info(f"Video found at: {video_path.absolute()}")
-                logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
+        try:
+            for vp in video_paths:
+                video_path = Path(vp)
+                logger.info(f"Checking path: {vp}")
+                logger.info(f"Path exists: {video_path.exists()}")
+                logger.info(f"Absolute path: {video_path.absolute()}")
                 
-                try:
-                    # Check if mobile device - safe approach without context access
-                    is_mobile = False
+                if video_path.exists():
+                    video_found = True
+                    logger.info(f"Video found at: {video_path.absolute()}")
+                    logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
+                    
                     try:
-                        # Try to detect mobile from session state or headers
-                        if hasattr(st, 'context') and hasattr(st.context, 'headers'):
-                            user_agent = st.context.headers.get("User-Agent", "").lower()
-                            is_mobile = any(x in user_agent for x in ["mobile", "android", "iphone", "ipad"])
-                    except:
-                        # Fallback: assume desktop if detection fails
+                        # Check if mobile device - safe approach without context access
                         is_mobile = False
-                    
-                    # Use mobile version if available and on mobile device
-                    mobile_video_path = Path("assets/videos/company_logo_animation_mobile.mp4")
-                    video_to_use = mobile_video_path if (is_mobile and mobile_video_path.exists()) else video_path
-                    
-                    # Set dimensions - smaller for mobile
-                    width, height = (300, 225) if is_mobile else (400, 300)
-                    
-                    # Read and encode video file
-                    with open(video_to_use, 'rb') as video_file:
-                        video_bytes = video_file.read()
-                        video_b64 = base64.b64encode(video_bytes).decode()
-                    
-                    # Create HTML5 video with autoplay, muted, and loop
-                    video_html = f'''
-                    <div style="display: flex; justify-content: center; margin: 20px 0;">
-                        <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
-                            <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                            <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                    '''
-                    st.markdown(video_html, unsafe_allow_html=True)
-                    logger.info(f"Video displayed ({width}x{height}) - Mobile: {is_mobile}")
-                    break
-                except Exception as e:
-                    logger.error(f"Error displaying video: {e}")
-                    st.error(f"Error loading video: {e}")
+                        try:
+                            # Try to detect mobile from session state or headers
+                            if hasattr(st, 'context') and hasattr(st.context, 'headers'):
+                                user_agent = st.context.headers.get("User-Agent", "").lower()
+                                is_mobile = any(x in user_agent for x in ["mobile", "android", "iphone", "ipad"])
+                        except:
+                            # Fallback: assume desktop if detection fails
+                            is_mobile = False
+                        
+                        # Use mobile version if available and on mobile device
+                        mobile_video_path = Path("assets/videos/company_logo_animation_mobile.mp4")
+                        video_to_use = mobile_video_path if (is_mobile and mobile_video_path.exists()) else video_path
+                        
+                        # Set dimensions - smaller for mobile
+                        width, height = (300, 225) if is_mobile else (400, 300)
+                        
+                        # Read and encode video file
+                        with open(video_to_use, 'rb') as video_file:
+                            video_bytes = video_file.read()
+                            video_b64 = base64.b64encode(video_bytes).decode()
+                        
+                        # Create HTML5 video with autoplay, muted, and loop
+                        video_html = f'''
+                        <div style="display: flex; justify-content: center; margin: 20px 0;">
+                            <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
+                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        '''
+                        st.markdown(video_html, unsafe_allow_html=True)
+                        logger.info(f"Video displayed ({width}x{height}) - Mobile: {is_mobile}")
+                        break
+                    except Exception as e:
+                        logger.error(f"Error displaying video: {e}")
+                        # Don't show error to user, just fall back to text
+                        break
+        except Exception as e:
+            logger.error(f"Critical error in video section: {e}")
+            video_found = False
         
         if not video_found:
             logger.warning("Video file not found at any expected location")
