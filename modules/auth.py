@@ -135,11 +135,11 @@ def show_login():
     logo_path = "assets/logos/swt_logo_white.png"
     st.markdown('<div class="clean-logo">', unsafe_allow_html=True)
     
-    # Suppress any error messages by using columns to isolate the image
+    # Clean image display without parameter warnings
     col1, col2, col3 = st.columns([0.05, 0.9, 0.05])
     with col2:
         try:
-            st.image(logo_path, use_column_width=True)
+            st.image(logo_path, width=None)
         except:
             # Silent fallback - no error display
             st.markdown("""
