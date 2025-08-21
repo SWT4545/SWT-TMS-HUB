@@ -62,23 +62,7 @@ def apply_global_styles():
             border-bottom: 3px solid #660000;
         }
         
-        /* Vernon badge in navbar */
-        .stApp::after {
-            content: '🔒 VERNON PROTECTED';
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            border: 2px solid white;
-            z-index: 1000000;
-            text-transform: uppercase;
-        }
+        /* Vernon badge removed */
         
         /* Main app - pure black background */
         .stApp {
