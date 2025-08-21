@@ -14,6 +14,18 @@ import sys
 import os
 from pathlib import Path
 
+def show_learning_center_view():
+    """Display Learning Center interface - NEEDS IMPLEMENTATION"""
+    st.markdown("## 🎓 Learning Center")
+    st.info("This view needs to be implemented with training modules and progress tracking.")
+    st.markdown("### Features to implement:")
+    st.markdown("- Training module categories")
+    st.markdown("- Video content integration")  
+    st.markdown("- Progress tracking")
+    st.markdown("- Quiz and assessments")
+    st.markdown("- Certification system")
+    return
+
 class LearningCenter:
     """Intelligent learning and self-updating system"""
     

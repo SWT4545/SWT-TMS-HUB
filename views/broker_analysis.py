@@ -9,6 +9,11 @@ from config.database import get_connection
 import plotly.express as px
 import plotly.graph_objects as go
 
+def show_broker_analysis_view():
+    """Display Broker Analysis interface"""
+    show_broker_analysis()
+    return
+
 def show_broker_analysis():
     """Main broker analysis interface"""
     st.title("📊 Broker Analysis & Business Development")

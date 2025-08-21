@@ -10,6 +10,17 @@ from config.database import get_connection
 import json
 import re
 
+def show_ai_assistant_view():
+    """Display AI Assistant interface - NEEDS IMPLEMENTATION"""
+    st.markdown("## 🤖 AI Assistant")
+    st.info("This view needs to be implemented with conversational AI interface.")
+    st.markdown("### Features to implement:")
+    st.markdown("- Chat interface with AI")
+    st.markdown("- TMS-specific responses")
+    st.markdown("- Load planning assistance")
+    st.markdown("- Route optimization")
+    return
+
 class IntelligentAssistant:
     """AI Assistant that understands everything about the business and personal life"""
     

@@ -9,6 +9,11 @@ from config.database import get_connection
 import sqlite3
 import json
 
+def show_database_management_view():
+    """Display Database Management interface"""
+    show_database_management()
+    return
+
 def show_database_management():
     """Main database management interface"""
     st.title("🗄️ Database Management")

@@ -10,6 +10,11 @@ from config.database import get_connection
 import plotly.express as px
 import plotly.graph_objects as go
 
+def show_personal_management_view():
+    """Display Personal Management interface"""
+    show_ceo_personal_management()
+    return
+
 def show_ceo_personal_management():
     """Main CEO personal management interface"""
     st.title("👔 CEO Personal & Lifestyle Management")
