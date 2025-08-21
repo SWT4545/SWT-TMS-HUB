@@ -154,11 +154,11 @@ def show_login():
                             <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
                             Your browser does not support the video tag.
                         </video>
-                        </div>
-                        '''
-                        st.markdown(video_html, unsafe_allow_html=True)
-                        logger.info("Video displayed with loop and muted")
-                        break
+                    </div>
+                    '''
+                    st.markdown(video_html, unsafe_allow_html=True)
+                    logger.info("Video displayed with loop and muted")
+                    break
                 except Exception as e:
                     logger.error(f"Error displaying video: {e}")
                     st.error(f"Error loading video: {e}")
