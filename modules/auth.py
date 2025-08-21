@@ -104,9 +104,13 @@ def show_login():
     .clean-logo {
         text-align: center;
         margin: 40px 0;
+        width: 100%;
     }
     .clean-logo img {
         filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+        width: 90% !important;
+        max-width: 800px !important;
+        height: auto !important;
     }
     .company-title {
         text-align: center;
@@ -127,13 +131,13 @@ def show_login():
     </style>
     """, unsafe_allow_html=True)
     
-    # Clean logo display - centered with no background boxes
+    # Clean logo display - stretched width without distortion
     logo_path = "assets/logos/swt_logo_white.png"
     try:
         st.markdown('<div class="clean-logo">', unsafe_allow_html=True)
-        st.image(logo_path, width=580)
+        st.image(logo_path, use_column_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
-        logger.info("Clean logo displayed successfully")
+        logger.info("Stretched logo displayed successfully")
         
     except Exception as e:
         logger.error(f"Error loading logo: {e}")
