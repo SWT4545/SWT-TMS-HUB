@@ -98,23 +98,24 @@ def show_login():
     # Initialize database on first run
     init_database()
     
-    # Center column for logo - NO VIDEO LOADING TO PREVENT TIMEOUTS
+    # Center column for logo
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # Simple company branding - no video loading
-        st.markdown("""
-        <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 15px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <h1 style="color: white; margin: 0; font-size: 2.5em; font-weight: bold;">🚚 SMITH & WILLIAMS</h1>
-            <h2 style="color: white; margin: 10px 0; font-size: 1.8em;">TRUCKING LLC</h2>
-            <p style="color: #94a3b8; margin-top: 20px; font-size: 1.2em;">Transportation Management System</p>
-            <hr style="border: 1px solid rgba(255,255,255,0.3); margin: 20px 0;">
-            <p style="color: #e2e8f0; margin: 0; font-size: 1em;">Reliable • Professional • Efficient</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Company titles
-    st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center; color: #8B0000; font-weight: bold;'>SMITH & WILLIAMS TRUCKING</h3>", unsafe_allow_html=True)
+        # Display company logo - using PNG instead of video
+        logo_path = "assets/logos/swt_logo_white.png"
+        try:
+            st.image(logo_path, width=400)
+            logger.info("White logo displayed successfully")
+        except Exception as e:
+            logger.error(f"Error loading logo: {e}")
+            # Fallback to text logo
+            st.markdown("""
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 10px; margin: 20px 0;">
+                <h1 style="color: white; margin: 0;">SMITH & WILLIAMS</h1>
+                <h2 style="color: white; margin: 0;">TRUCKING LLC</h2>
+                <p style="color: #94a3b8; margin-top: 10px;">🚚 Transportation Management System</p>
+            </div>
+            """, unsafe_allow_html=True)
     
     # Show default credentials info
     with st.expander("📌 Login Information"):
