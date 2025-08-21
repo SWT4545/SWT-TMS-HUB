@@ -138,26 +138,26 @@ def show_login():
                     mobile_video_path = Path("assets/videos/company_logo_animation_mobile.mp4")
                     video_to_use = mobile_video_path if (is_mobile and mobile_video_path.exists()) else video_path
                     
+                    # Smaller dimensions for mobile
+                    width, height = (300, 225) if is_mobile else (400, 300)
+                    
                     # Display video with HTML5 for loop and muted autoplay
                     with open(video_to_use, 'rb') as video_file:
                         video_bytes = video_file.read()
                         video_b64 = base64.b64encode(video_bytes).decode()
                         
-                    # Smaller dimensions for mobile
-                    width, height = (300, 225) if is_mobile else (400, 300)
-                        
-                    # HTML5 video with autoplay, muted, and loop
-                    video_html = f'''
-                    <div style="display: flex; justify-content: center; margin: 20px 0;">
-                        <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
-                            <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                            <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                    '''
-                    st.markdown(video_html, unsafe_allow_html=True)
-                    logger.info("Video displayed with loop and muted")
+                        # HTML5 video with autoplay, muted, and loop
+                        video_html = f'''
+                        <div style="display: flex; justify-content: center; margin: 20px 0;">
+                            <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
+                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        '''
+                        st.markdown(video_html, unsafe_allow_html=True)
+                        logger.info("Video displayed with loop and muted")
                     break
                 except Exception as e:
                     logger.error(f"Error displaying video: {e}")
