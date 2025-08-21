@@ -98,96 +98,19 @@ def show_login():
     # Initialize database on first run
     init_database()
     
-    # Center column for logo/video
+    # Center column for logo - NO VIDEO LOADING TO PREVENT TIMEOUTS
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        # PRIORITY: Display video first, fallback to logo if needed
-        # ONLY ONE WILL DISPLAY - NEVER BOTH
-        
-        # Log current working directory and check for video
-        logger.info(f"Current working directory: {os.getcwd()}")
-        logger.info(f"Looking for video file...")
-        
-        # Check multiple possible paths
-        video_paths = [
-            "assets/videos/company_logo_animation.mp4.MOV",
-            "assets/videos/company_logo_animation.mp4",
-            "./assets/videos/company_logo_animation.mp4.MOV",
-            os.path.join(os.getcwd(), "assets", "videos", "company_logo_animation.mp4.MOV")
-        ]
-        
-        video_found = False
-        try:
-            for vp in video_paths:
-                video_path = Path(vp)
-                logger.info(f"Checking path: {vp}")
-                logger.info(f"Path exists: {video_path.exists()}")
-                logger.info(f"Absolute path: {video_path.absolute()}")
-                
-                if video_path.exists():
-                    video_found = True
-                    logger.info(f"Video found at: {video_path.absolute()}")
-                    logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
-                    
-                    try:
-                        # Check if mobile device - safe approach without context access
-                        is_mobile = False
-                        try:
-                            # Try to detect mobile from session state or headers
-                            if hasattr(st, 'context') and hasattr(st.context, 'headers'):
-                                user_agent = st.context.headers.get("User-Agent", "").lower()
-                                is_mobile = any(x in user_agent for x in ["mobile", "android", "iphone", "ipad"])
-                        except:
-                            # Fallback: assume desktop if detection fails
-                            is_mobile = False
-                        
-                        # Use mobile version if available and on mobile device
-                        mobile_video_path = Path("assets/videos/company_logo_animation_mobile.mp4")
-                        video_to_use = mobile_video_path if (is_mobile and mobile_video_path.exists()) else video_path
-                        
-                        # Set dimensions - smaller for mobile
-                        width, height = (300, 225) if is_mobile else (400, 300)
-                        
-                        # Read and encode video file
-                        with open(video_to_use, 'rb') as video_file:
-                            video_bytes = video_file.read()
-                            video_b64 = base64.b64encode(video_bytes).decode()
-                        
-                        # Create HTML5 video with autoplay, muted, and loop
-                        video_html = f'''
-                        <div style="display: flex; justify-content: center; margin: 20px 0;">
-                            <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
-                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                        '''
-                        st.markdown(video_html, unsafe_allow_html=True)
-                        logger.info(f"Video displayed ({width}x{height}) - Mobile: {is_mobile}")
-                        break
-                    except Exception as e:
-                        logger.error(f"Error displaying video: {e}")
-                        # Don't show error to user, just fall back to text
-                        break
-        except Exception as e:
-            logger.error(f"Critical error in video section: {e}")
-            video_found = False
-        
-        if not video_found:
-            logger.warning("Video file not found at any expected location")
-            # List files in assets directory for debugging
-            try:
-                assets_path = Path("assets")
-                if assets_path.exists():
-                    logger.info(f"Contents of assets directory: {list(assets_path.iterdir())}")
-                    videos_path = assets_path / "videos"
-                    if videos_path.exists():
-                        logger.info(f"Contents of assets/videos: {list(videos_path.iterdir())}")
-            except Exception as e:
-                logger.error(f"Error listing directory contents: {e}")
-            
-            st.info("🚚 Smith & Williams Trucking")
+        # Simple company branding - no video loading
+        st.markdown("""
+        <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 15px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h1 style="color: white; margin: 0; font-size: 2.5em; font-weight: bold;">🚚 SMITH & WILLIAMS</h1>
+            <h2 style="color: white; margin: 10px 0; font-size: 1.8em;">TRUCKING LLC</h2>
+            <p style="color: #94a3b8; margin-top: 20px; font-size: 1.2em;">Transportation Management System</p>
+            <hr style="border: 1px solid rgba(255,255,255,0.3); margin: 20px 0;">
+            <p style="color: #e2e8f0; margin: 0; font-size: 1em;">Reliable • Professional • Efficient</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Company titles
     st.markdown("<h1 style='text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);'>Transportation Management System</h1>", unsafe_allow_html=True)
