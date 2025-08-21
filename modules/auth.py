@@ -93,44 +93,106 @@ def authenticate_user(username, password):
     return None
 
 def show_login():
-    """Display login interface with enhanced Smith & Williams branding"""
+    """Display professional login interface with premium Smith & Williams branding"""
     
     # Initialize database on first run
     init_database()
     
-    # Center column for logo - Clean and Simple
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # Professional page styling
+    st.markdown("""
+    <style>
+    .professional-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 30%, #334155 70%, #475569 100%);
+        padding: 50px 40px;
+        border-radius: 25px;
+        margin: 20px 0 40px 0;
+        box-shadow: 
+            0 25px 50px rgba(0,0,0,0.4),
+            inset 0 1px 0 rgba(255,255,255,0.1);
+        border: 2px solid rgba(255,255,255,0.1);
+        position: relative;
+    }
+    .professional-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6, #3b82f6);
+        border-radius: 25px 25px 0 0;
+    }
+    .company-tagline {
+        font-size: 1.3em;
+        color: #94a3b8;
+        text-align: center;
+        margin: 25px 0 20px 0;
+        letter-spacing: 2px;
+        font-weight: 300;
+    }
+    .professional-badges {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+    .pro-badge {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.95em;
+        font-weight: 600;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Main professional header
+    st.markdown('<div class="professional-header">', unsafe_allow_html=True)
+    
+    # Enhanced logo display with professional layout
+    col1, col2, col3 = st.columns([0.1, 1, 0.1])
     with col2:
-        # Clean logo container
-        st.markdown("""
-        <div style="text-align: center; padding: 30px; background: rgba(15, 23, 42, 0.8); border-radius: 15px; margin: 20px 0;">
-        """, unsafe_allow_html=True)
-        
-        # Display company logo - bigger and cleaner
+        # Display company logo with premium presentation
         logo_path = "assets/logos/swt_logo_white.png"
         try:
-            st.image(logo_path, width=500)
-            logger.info("White logo displayed successfully")
-            
-            # Simple tagline
-            st.markdown("""
-            <p style="color: #94a3b8; text-align: center; margin-top: 15px; font-size: 1.1em;">
-                Transportation Management System
-            </p>
-            """, unsafe_allow_html=True)
+            # Professional logo centering
+            st.markdown('<div style="text-align: center; margin: 20px 0 30px 0;">', unsafe_allow_html=True)
+            st.image(logo_path, width=580)
+            st.markdown('</div>', unsafe_allow_html=True)
+            logger.info("Professional logo displayed successfully")
             
         except Exception as e:
             logger.error(f"Error loading logo: {e}")
-            # Simple fallback
+            # Professional fallback branding
             st.markdown("""
             <div style="text-align: center;">
-                <h1 style="color: white; font-size: 2.5em; margin: 0;">SMITH & WILLIAMS</h1>
-                <h2 style="color: #e2e8f0; font-size: 1.8em; margin: 10px 0;">TRUCKING LLC</h2>
-                <p style="color: #94a3b8; margin-top: 15px;">🚚 Transportation Management System</p>
+                <h1 style="color: white; font-size: 3.5em; font-weight: 800; margin: 0; letter-spacing: 2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.7);">
+                    SMITH & WILLIAMS
+                </h1>
+                <h2 style="color: #e2e8f0; font-size: 2em; font-weight: 300; margin: 15px 0; letter-spacing: 3px;">
+                    TRUCKING LLC
+                </h2>
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Professional company description and credentials
+        st.markdown("""
+        <p class="company-tagline">
+            🚚 TRANSPORTATION MANAGEMENT SYSTEM
+        </p>
+        <div class="professional-badges">
+            <span class="pro-badge">RELIABLE SERVICE</span>
+            <span class="pro-badge">PROFESSIONAL</span>
+            <span class="pro-badge">EFFICIENT</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Show default credentials info
     with st.expander("📌 Login Information"):
@@ -140,36 +202,78 @@ def show_login():
         - Username: `admin` | Password: `admin123`
         """)
     
-    # Login form with proper styling
-    with st.form("login_form", clear_on_submit=False):
-        username = st.text_input("Username", placeholder="Enter your username")
-        password = st.text_input("Password", type="password", placeholder="Enter your password")
+    # Professional login form section
+    st.markdown("""
+    <style>
+    .login-container {
+        background: rgba(15, 23, 42, 0.95);
+        padding: 40px;
+        border-radius: 20px;
+        margin: 30px 0;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .login-title {
+        color: white;
+        font-size: 2.2em;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+    }
+    .stTextInput input {
+        font-size: 1.1em !important;
+        padding: 12px !important;
+        background: rgba(30, 41, 59, 0.8) !important;
+        border: 2px solid rgba(59, 130, 246, 0.3) !important;
+        border-radius: 10px !important;
+        color: white !important;
+    }
+    .stTextInput label {
+        font-size: 1.2em !important;
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Professional login form container
+    col1, col2, col3 = st.columns([0.3, 1, 0.3])
+    with col2:
+        st.markdown('<div class="login-container">', unsafe_allow_html=True)
+        st.markdown('<h2 class="login-title">🔐 SECURE LOGIN</h2>', unsafe_allow_html=True)
         
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            login_button = st.form_submit_button("🔐 LOGIN", type="primary", use_container_width=True)
-        with col_btn2:
-            clear_button = st.form_submit_button("🔄 CLEAR", use_container_width=True)
-        
-        if login_button:
-            if username and password:
-                user = authenticate_user(username, password)
-                if user:
-                    st.session_state.authenticated = True
-                    st.session_state.user = user['username']
-                    st.session_state.role = user['role']
-                    st.session_state.user_full_name = user['full_name']
-                    st.session_state.user_id = user['id']
-                    st.success(f"Welcome back, {user['full_name']}!")
-                    time.sleep(1)
-                    st.rerun()
+        with st.form("login_form", clear_on_submit=False):
+            username = st.text_input("Username", placeholder="Enter your username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password")
+            
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                login_button = st.form_submit_button("🔐 LOGIN", type="primary", use_container_width=True)
+            with col_btn2:
+                clear_button = st.form_submit_button("🔄 CLEAR", use_container_width=True)
+            
+            if login_button:
+                if username and password:
+                    user = authenticate_user(username, password)
+                    if user:
+                        st.session_state.authenticated = True
+                        st.session_state.user = user['username']
+                        st.session_state.role = user['role']
+                        st.session_state.user_full_name = user['full_name']
+                        st.session_state.user_id = user['id']
+                        st.success(f"Welcome back, {user['full_name']}!")
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid username or password")
                 else:
-                    st.error("❌ Invalid username or password")
-            else:
-                st.warning("⚠️ Please enter both username and password")
+                    st.warning("⚠️ Please enter both username and password")
+            
+            if clear_button:
+                st.rerun()
         
-        if clear_button:
-            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     # Apply aggressive button styling using JavaScript injection
     st.markdown("""
