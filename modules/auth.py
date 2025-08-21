@@ -98,74 +98,39 @@ def show_login():
     # Initialize database on first run
     init_database()
     
-    # Enhanced logo section with better styling
-    st.markdown("""
-    <style>
-    .logo-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 30px 0;
-        padding: 40px;
-        background: linear-gradient(145deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        border-radius: 20px;
-        box-shadow: 
-            0 20px 40px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .logo-wrapper {
-        text-align: center;
-        max-width: 600px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # Center logo with enhanced styling
-    col1, col2, col3 = st.columns([0.5, 3, 0.5])
+    # Center column for logo - Clean and Simple
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-        st.markdown('<div class="logo-wrapper">', unsafe_allow_html=True)
+        # Clean logo container
+        st.markdown("""
+        <div style="text-align: center; padding: 30px; background: rgba(15, 23, 42, 0.8); border-radius: 15px; margin: 20px 0;">
+        """, unsafe_allow_html=True)
         
-        # Display company logo - enhanced and bigger
+        # Display company logo - bigger and cleaner
         logo_path = "assets/logos/swt_logo_white.png"
         try:
-            # Bigger, cleaner logo with better styling
-            st.image(logo_path, width=550, use_column_width=False)
-            logger.info("Enhanced white logo displayed successfully")
+            st.image(logo_path, width=500)
+            logger.info("White logo displayed successfully")
             
-            # Add subtle tagline below logo
+            # Simple tagline
             st.markdown("""
-            <div style="margin-top: 20px;">
-                <p style="color: #94a3b8; font-size: 1.1em; margin: 0; font-weight: 300; letter-spacing: 1px;">
-                    TRANSPORTATION MANAGEMENT SYSTEM
-                </p>
-                <p style="color: #64748b; font-size: 0.9em; margin: 10px 0 0 0; font-style: italic;">
-                    Reliable • Professional • Efficient
-                </p>
-            </div>
+            <p style="color: #94a3b8; text-align: center; margin-top: 15px; font-size: 1.1em;">
+                Transportation Management System
+            </p>
             """, unsafe_allow_html=True)
             
         except Exception as e:
             logger.error(f"Error loading logo: {e}")
-            # Enhanced fallback with better styling
+            # Simple fallback
             st.markdown("""
             <div style="text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 3.5em; font-weight: 700; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
-                    SMITH & WILLIAMS
-                </h1>
-                <h2 style="color: #e2e8f0; margin: 15px 0; font-size: 2.2em; font-weight: 400;">
-                    TRUCKING LLC
-                </h2>
-                <div style="width: 200px; height: 3px; background: linear-gradient(90deg, #3b82f6, #06b6d4); margin: 20px auto; border-radius: 2px;"></div>
-                <p style="color: #94a3b8; font-size: 1.1em; margin: 20px 0 0 0; letter-spacing: 1px;">
-                    🚚 TRANSPORTATION MANAGEMENT SYSTEM
-                </p>
+                <h1 style="color: white; font-size: 2.5em; margin: 0;">SMITH & WILLIAMS</h1>
+                <h2 style="color: #e2e8f0; font-size: 1.8em; margin: 10px 0;">TRUCKING LLC</h2>
+                <p style="color: #94a3b8; margin-top: 15px;">🚚 Transportation Management System</p>
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     # Show default credentials info
     with st.expander("📌 Login Information"):
