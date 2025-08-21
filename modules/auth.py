@@ -115,39 +115,39 @@ def show_login():
     .company-title {
         text-align: center;
         color: #94a3b8;
-        font-size: 1.4em;
-        font-weight: 300;
+        font-size: 1.8em;
+        font-weight: 400;
         letter-spacing: 2px;
-        margin: 20px 0;
+        margin: 25px 0;
     }
     .company-slogan {
         text-align: center;
         color: #60a5fa;
-        font-size: 1.6em;
+        font-size: 2.2em;
         font-weight: 800;
         letter-spacing: 2px;
-        margin: 20px 0;
+        margin: 25px 0;
     }
     </style>
     """, unsafe_allow_html=True)
     
     # Clean logo display - stretched width without distortion
     logo_path = "assets/logos/swt_logo_white.png"
-    try:
-        st.markdown('<div class="clean-logo">', unsafe_allow_html=True)
-        st.image(logo_path, use_column_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        logger.info("Stretched logo displayed successfully")
-        
-    except Exception as e:
-        logger.error(f"Error loading logo: {e}")
-        # Clean text fallback
-        st.markdown("""
-        <div style="text-align: center; margin: 40px 0;">
-            <h1 style="color: white; font-size: 3em; margin: 0;">SMITH & WILLIAMS</h1>
-            <h2 style="color: #e2e8f0; font-size: 2em; margin: 10px 0;">TRUCKING LLC</h2>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown('<div class="clean-logo">', unsafe_allow_html=True)
+    
+    # Suppress any error messages by using columns to isolate the image
+    col1, col2, col3 = st.columns([0.05, 0.9, 0.05])
+    with col2:
+        try:
+            st.image(logo_path, use_column_width=True)
+        except:
+            # Silent fallback - no error display
+            st.markdown("""
+            <h1 style="color: white; font-size: 3em; margin: 0; text-align: center;">SMITH & WILLIAMS</h1>
+            <h2 style="color: #e2e8f0; font-size: 2em; margin: 10px 0; text-align: center;">TRUCKING LLC</h2>
+            """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Clean company information
     st.markdown("""
