@@ -129,19 +129,31 @@ def show_login():
                 logger.info(f"File size: {video_path.stat().st_size / 1024 / 1024:.2f} MB")
                 
                 try:
+                    # Check if mobile device and use smaller video
+                    import streamlit as st
+                    user_agent = st.context.headers.get("User-Agent", "").lower() if hasattr(st.context, 'headers') else ""
+                    is_mobile = any(x in user_agent for x in ["mobile", "android", "iphone", "ipad"])
+                    
+                    # Use mobile version if available and on mobile device
+                    mobile_video_path = Path("assets/videos/company_logo_animation_mobile.mp4")
+                    video_to_use = mobile_video_path if (is_mobile and mobile_video_path.exists()) else video_path
+                    
                     # Display video with HTML5 for loop and muted autoplay
-                    with open(video_path, 'rb') as video_file:
+                    with open(video_to_use, 'rb') as video_file:
                         video_bytes = video_file.read()
                         video_b64 = base64.b64encode(video_bytes).decode()
                         
-                        # HTML5 video with autoplay, muted, and loop
-                        video_html = f'''
-                        <div style="display: flex; justify-content: center; margin: 20px 0;">
-                            <video width="400" height="300" autoplay muted loop playsinline style="border-radius: 10px;">
-                                <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                                <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
-                                Your browser does not support the video tag.
-                            </video>
+                    # Smaller dimensions for mobile
+                    width, height = (300, 225) if is_mobile else (400, 300)
+                        
+                    # HTML5 video with autoplay, muted, and loop
+                    video_html = f'''
+                    <div style="display: flex; justify-content: center; margin: 20px 0;">
+                        <video width="{width}" height="{height}" autoplay muted loop playsinline style="border-radius: 10px;">
+                            <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                            <source src="data:video/quicktime;base64,{video_b64}" type="video/quicktime">
+                            Your browser does not support the video tag.
+                        </video>
                         </div>
                         '''
                         st.markdown(video_html, unsafe_allow_html=True)
