@@ -160,28 +160,19 @@ def show_login():
         # Display company logo with raised effect and perfect centering
         logo_path = "assets/logos/swt_logo_white.png"
         try:
-            # Centered logo with raised effect
-            st.markdown("""
-            <div style="
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                margin: 30px 0 40px 0;
-                padding: 25px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 20px;
-                box-shadow: 
-                    0 20px 40px rgba(0,0,0,0.4),
-                    inset 0 1px 0 rgba(255,255,255,0.2),
-                    inset 0 -1px 0 rgba(0,0,0,0.2);
-                border: 1px solid rgba(255,255,255,0.1);
-            ">
-            """, unsafe_allow_html=True)
-            
-            # Logo with additional raised effect
+            # Logo with raised effect - properly centered
             st.markdown("""
             <style>
+            .logo-center {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                margin: 30px 0;
+            }
             .raised-logo img {
+                display: block;
+                margin: 0 auto;
                 filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)) 
                         drop-shadow(0 5px 10px rgba(0,0,0,0.3));
                 transition: all 0.3s ease;
@@ -192,13 +183,13 @@ def show_login():
                 transform: translateY(-2px);
             }
             </style>
-            <div class="raised-logo">
+            <div class="logo-center">
+                <div class="raised-logo">
             """, unsafe_allow_html=True)
             
             st.image(logo_path, width=580)
-            st.markdown('</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            logger.info("Raised logo displayed successfully")
+            st.markdown('</div></div>', unsafe_allow_html=True)
+            logger.info("Centered raised logo displayed successfully")
             
         except Exception as e:
             logger.error(f"Error loading logo: {e}")
@@ -214,14 +205,14 @@ def show_login():
             </div>
             """, unsafe_allow_html=True)
         
-        # Company slogan and professional description
+        # Company tagline and subtitle
         st.markdown("""
         <p class="company-tagline">
             TRANSPORTATION MANAGEMENT SYSTEM
         </p>
         <div style="text-align: center; margin-top: 25px;">
-            <p style="color: #60a5fa; font-size: 1.4em; font-weight: 600; letter-spacing: 2px; margin: 0;">
-                "MOVING AMERICA FORWARD, ONE LOAD AT A TIME"
+            <p style="color: #60a5fa; font-size: 1.6em; font-weight: 800; letter-spacing: 2px; margin: 0;">
+                PROFESSIONAL FLEET MANAGEMENT SOLUTIONS
             </p>
         </div>
         """, unsafe_allow_html=True)
