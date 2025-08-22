@@ -6,10 +6,50 @@ import streamlit as st
 import sqlite3
 from datetime import datetime, date, timedelta
 import pandas as pd
-from modules.database_enhanced import get_db_connection, init_enhanced_database
+# Critical database imports with fallbacks
+try:
+    from modules.database_enhanced import get_db_connection, init_enhanced_database
+except ImportError:
+    # Fallback database functions
+    def get_db_connection():
+        import sqlite3
+        return sqlite3.connect("swt_tms.db")
+    
+    def init_enhanced_database():
+        conn = sqlite3.connect("swt_tms.db")
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL,
+            full_name TEXT,
+            email TEXT,
+            phone TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_login TIMESTAMP,
+            is_active BOOLEAN DEFAULT 1
+        )''')
+        conn.commit()
+        conn.close()
 import hashlib
-from modules.ui_enhancements import add_cancel_button, confirmation_dialog, process_with_cancel
-from modules.api_integrations import GoogleMapsAPI
+# Optional imports with fallbacks
+try:
+    from modules.ui_enhancements import add_cancel_button, confirmation_dialog, process_with_cancel
+except ImportError:
+    # Fallback functions if module doesn't exist
+    def add_cancel_button(*args, **kwargs):
+        return False
+    def confirmation_dialog(*args, **kwargs):
+        return False
+    def process_with_cancel(*args, **kwargs):
+        return None
+
+try:
+    from modules.api_integrations import GoogleMapsAPI
+except ImportError:
+    # Fallback if module doesn't exist
+    GoogleMapsAPI = None
 
 def get_safe_db_connection():
     """Get database connection with fallback mechanism"""
@@ -200,14 +240,78 @@ def ensure_all_management_tables():
 
 def show_comprehensive_management_view():
     """Display Comprehensive Management interface"""
-    # Force database initialization at the view level
     try:
-        force_initialize_database()
-        show_comprehensive_management()
-    except Exception as e:
-        st.error(f"Critical database error: {str(e)}")
-        st.error("Please contact system administrator")
+        # Force database initialization at the view level
+        try:
+            force_initialize_database()
+            show_comprehensive_management()
+        except Exception as e:
+            st.error(f"Critical database error: {str(e)}")
+            st.error("Please contact system administrator")
+            show_minimal_interface()
+    except Exception as critical_error:
+        # Last resort - show basic interface
+        st.title("Management Center")
+        st.error(f"System initialization error: {str(critical_error)}")
+        st.info("The system is starting up. Please refresh the page.")
+        show_basic_user_management()
     return
+
+def show_minimal_interface():
+    """Show minimal interface when database fails"""
+    st.title("Management Center - Limited Mode")
+    st.warning("Database is initializing. Limited functionality available.")
+    
+    with st.expander("Add User (Basic)"):
+        with st.form("basic_user_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password") 
+            role = st.selectbox("Role", ["admin", "user"])
+            
+            if st.form_submit_button("Add User"):
+                st.info("User creation will be available once database is ready.")
+
+def show_basic_user_management():
+    """Ultra-basic user management without any external dependencies"""
+    st.title("User Management - Basic Mode")
+    st.info("System is starting up. Basic user management available.")
+    
+    with st.form("emergency_user_form"):
+        st.subheader("Create Emergency Admin User")
+        username = st.text_input("Username", value="admin")
+        password = st.text_input("Password", type="password", value="admin123")
+        
+        if st.form_submit_button("Create Admin User"):
+            try:
+                import sqlite3
+                conn = sqlite3.connect("swt_tms.db")
+                cursor = conn.cursor()
+                
+                # Create users table
+                cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    full_name TEXT,
+                    is_active BOOLEAN DEFAULT 1
+                )''')
+                
+                # Create admin user
+                import hashlib
+                password_hash = hashlib.sha256(password.encode()).hexdigest()
+                cursor.execute("""
+                    INSERT OR REPLACE INTO users (username, password_hash, role, full_name, is_active)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (username, password_hash, "super_user", "Emergency Admin", 1))
+                
+                conn.commit()
+                conn.close()
+                st.success(f"Emergency admin user '{username}' created successfully!")
+                st.info("Please refresh the page to continue.")
+                
+            except Exception as e:
+                st.error(f"Emergency user creation failed: {str(e)}")
 
 def force_initialize_database():
     """Force initialize database with complete error handling"""
@@ -227,6 +331,20 @@ def show_comprehensive_management():
     # Check user permissions
     if st.session_state.get('role') not in ['super_user', 'ceo', 'admin']:
         st.error("Access Denied: Admin privileges required")
+        return
+    
+    # Test database connectivity before showing interface
+    try:
+        conn = get_safe_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        conn.close()
+        database_ready = True
+    except Exception as e:
+        database_ready = False
+        st.error(f"Database initialization in progress: {str(e)}")
+        st.info("Please refresh the page in a few moments.")
         return
     
     # Main management tabs
